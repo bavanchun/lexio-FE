@@ -57,7 +57,31 @@
     "back": "Back",
     "next": "Next",
     "done": "Done",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "close": "Close"
+  },
+  "decks": {
+    "title": "Decks",
+    "subtitle": "Browse and study your vocabulary decks",
+    "empty": "No decks yet — but the IT/Tech Essentials deck should auto-seed on first load",
+    "cardCount": "{count, plural, one {# card} other {# cards}}",
+    "startStudying": "Start studying",
+    "cardsTab": "Cards",
+    "detailsTab": "Details"
+  },
+  "card": {
+    "previewTitle": "Card preview",
+    "examples": "Examples",
+    "collocations": "Collocations",
+    "synonyms": "Synonyms",
+    "antonyms": "Antonyms",
+    "wordFamily": "Word family",
+    "etymology": "Etymology",
+    "frequency": "Frequency rank",
+    "cefr": "CEFR level",
+    "audioUS": "Audio (US)",
+    "audioUK": "Audio (UK)",
+    "noAudio": "No audio available"
   },
   "study": {
     "again": "Again",
