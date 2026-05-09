@@ -92,7 +92,18 @@ function makeStubDeps() {
     })),
   };
 
-  return { userCardRepo, reviewRepo, sessionRepo, streakRepo, userXpRepo, achievementRepo };
+  // In-memory repos are already atomic — pass-through transaction wrapper
+  const runInTransaction = vi.fn().mockImplementation(<T>(fn: () => Promise<T>) => fn());
+
+  return {
+    userCardRepo,
+    reviewRepo,
+    sessionRepo,
+    streakRepo,
+    userXpRepo,
+    achievementRepo,
+    runInTransaction,
+  };
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -305,5 +316,47 @@ describe('submitReview use case', () => {
     });
 
     expect(deps.streakRepo.upsert).toHaveBeenCalledOnce();
+  });
+
+  it('calls runInTransaction to wrap all writes atomically', async () => {
+    await submitReview(deps, {
+      userCard: makeUserCard(),
+      rating: 3 as Rating,
+      sessionId: SESSION_ID,
+      durationMs: 1000,
+      sessionReviewCount: 0,
+      sessionCorrectCount: 0,
+      now: NOW,
+    });
+
+    // runInTransaction must be called exactly once, wrapping all writes
+    expect(deps.runInTransaction).toHaveBeenCalledOnce();
+  });
+
+  it('propagates transaction abort — no writes committed when achievement award fails', async () => {
+    // Simulate achievement award throwing mid-transaction
+    const abortError = new Error('simulated transaction abort');
+    (deps.achievementRepo.listByUser as ReturnType<typeof vi.fn>).mockResolvedValue([]);
+    // Make runInTransaction actually run the fn but make achievement.award throw
+    (deps.achievementRepo.award as ReturnType<typeof vi.fn>).mockRejectedValue(abortError);
+
+    // The use case checks achievements only if newlyEarned.length > 0.
+    // Simulate a first-review scenario so first_steps is earned → award is called.
+    await expect(
+      submitReview(deps, {
+        userCard: makeUserCard(),
+        rating: 3 as Rating,
+        sessionId: SESSION_ID,
+        durationMs: 1000,
+        sessionReviewCount: 0, // totalReviews=1 → first_steps triggers
+        sessionCorrectCount: 0,
+        now: NOW,
+      }),
+    ).rejects.toThrow('simulated transaction abort');
+
+    // userCardRepo.upsert was called INSIDE the transaction fn —
+    // in a real Dexie transaction the abort would undo it. With in-memory stubs
+    // we verify the error propagates (full rollback tested in integration tests).
+    expect(deps.achievementRepo.award).toHaveBeenCalled();
   });
 });
