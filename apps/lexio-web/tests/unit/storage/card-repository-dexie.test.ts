@@ -17,6 +17,8 @@ function makeCard(overrides: Partial<Card> = {}): Omit<Card, 'id' | 'createdAt' 
   return {
     deckId: 'deck-001' as DeckId,
     word: 'refactor',
+    ipaUs: 'riːˈfæktər',
+    ipaUk: 'riːˈfæktə',
     ipa: '/riːˈfæktər/',
     definition: 'Restructure existing code without changing its behavior.',
     exampleSentence: 'We need to refactor the legacy module.',
@@ -27,6 +29,12 @@ function makeCard(overrides: Partial<Card> = {}): Omit<Card, 'id' | 'createdAt' 
     tags: ['verb', 'software'],
     cefrLevel: 'B2',
     exerciseTypes: ['flashcard', 'multiple_choice'],
+    collocations: ['refactor code', 'refactor a module'],
+    synonyms: ['restructure', 'reorganise'],
+    antonyms: [],
+    wordFamily: { verb: 'refactor', noun: 'refactoring' },
+    etymology: null,
+    frequencyRank: null,
     createdBy: 'user-001',
     ...overrides,
   };
