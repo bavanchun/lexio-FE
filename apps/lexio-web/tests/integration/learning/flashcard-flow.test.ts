@@ -225,6 +225,8 @@ describe('Flashcard study flow — integration', () => {
 
     expect(queue.length).toBeGreaterThan(0);
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const firstItem = queue[0]!;
     await submitReview(
       {
         userCardRepo: repos.userCards,
@@ -235,7 +237,7 @@ describe('Flashcard study flow — integration', () => {
         achievementRepo: repos.achievements,
       },
       {
-        userCard: queue[0].userCard,
+        userCard: firstItem.userCard,
         rating: 3 as Rating,
         sessionId: session.id,
         durationMs: 2000,
@@ -265,6 +267,7 @@ describe('Flashcard study flow — integration', () => {
 
     expect(queue.length).toBeGreaterThan(0);
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const result = await submitReview(
       {
         userCardRepo: repos.userCards,
@@ -275,7 +278,7 @@ describe('Flashcard study flow — integration', () => {
         achievementRepo: repos.achievements,
       },
       {
-        userCard: queue[0].userCard,
+        userCard: queue[0]!.userCard,
         rating: 3 as Rating,
         sessionId: session.id,
         durationMs: 2000,
@@ -306,7 +309,8 @@ describe('Flashcard study flow — integration', () => {
     );
 
     expect(queue.length).toBeGreaterThan(0);
-    const originalCard = queue[0].userCard;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const originalCard = queue[0]!.userCard;
     expect(originalCard.stage).toBe('New');
 
     const result = await submitReview(
