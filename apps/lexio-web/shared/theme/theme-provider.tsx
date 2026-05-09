@@ -1,0 +1,22 @@
+'use client';
+
+/**
+ * Thin next-themes wrapper.
+ * defaultTheme="dark" — §12.5 rule 10: dark mode designed first.
+ */
+import { ThemeProvider as NextThemesProvider } from 'next-themes';
+import type { ThemeProviderProps } from 'next-themes';
+
+export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+  return (
+    <NextThemesProvider
+      attribute="class"
+      defaultTheme="dark"
+      enableSystem
+      disableTransitionOnChange
+      {...props}
+    >
+      {children}
+    </NextThemesProvider>
+  );
+}
