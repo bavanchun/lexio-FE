@@ -8,7 +8,7 @@
 ## Overview
 
 - **Priority:** P2
-- **Status:** pending
+- **Status:** complete
 - **Brief:** Update `./docs/codebase-summary.md`, `./docs/system-architecture.md`. Write quickstart `./README.md`. Document next-iteration TODOs (.NET 10 Identity scaffold first, then Free Dictionary integration, then real auth, etc.).
 
 ## Key insights
@@ -89,13 +89,13 @@
 
 ## Todo
 
-- [ ] README quickstart
-- [ ] codebase-summary.md
-- [ ] system-architecture.md
-- [ ] project-changelog.md
-- [ ] development-roadmap.md (update with .NET 10 not 9)
-- [ ] Verify all internal links work
-- [ ] Self-review for grammar / concision
+- [x] README quickstart
+- [x] codebase-summary.md
+- [x] system-architecture.md
+- [x] project-changelog.md
+- [x] development-roadmap.md (update with .NET 10 not 9)
+- [x] Verify all internal links work
+- [x] Self-review for grammar / concision
 
 ## Success criteria
 
