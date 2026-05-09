@@ -1,0 +1,45 @@
+'use client';
+
+/**
+ * Authenticated app layout — composes DB init, auth guard, and app shell.
+ *
+ * Boundary notes:
+ *   - DbInitProvider comes from shared/ (wraps lib/storage/DbInitGate)
+ *   - RequireAuth + useAuthStore come from features/auth (app → features is allowed)
+ *   - AppShell comes from shared/ (app → shared is allowed)
+ *
+ * Auth context (displayName, signOut) is read here (app layer, allowed to import
+ * features/) and injected into AppShell as props so shared/ stays features/-free.
+ */
+import { useRouter } from 'next/navigation';
+import { DbInitProvider } from '@/shared/components/providers/db-init-provider';
+import { RequireAuth } from '@/features/auth';
+import { useAuthStore } from '@/features/auth';
+import { AppShell } from '@/shared/components/layout/app-shell';
+
+function AuthenticatedShell({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const user = useAuthStore((s) => s.user);
+  const signOut = useAuthStore((s) => s.signOut);
+
+  function handleSignOut() {
+    signOut();
+    router.push('/login');
+  }
+
+  return (
+    <AppShell displayName={user?.displayName ?? ''} onSignOut={handleSignOut}>
+      {children}
+    </AppShell>
+  );
+}
+
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <DbInitProvider>
+      <RequireAuth>
+        <AuthenticatedShell>{children}</AuthenticatedShell>
+      </RequireAuth>
+    </DbInitProvider>
+  );
+}
