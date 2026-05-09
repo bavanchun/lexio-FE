@@ -3,65 +3,35 @@
  *
  * Current implementation: MockApiClient backed by Dexie repositories.
  *
- * To swap to real HTTP: replace the MockApiClient construction below with
+ * To swap to real HTTP: replace MockApiClient construction below with
  * `new HttpApiClient({ baseUrl: process.env.NEXT_PUBLIC_API_URL })`.
  * Nothing else needs to change — features/ import only LexioApiClient.
  *
- * NOTE: This module creates the db + repos lazily on first import so that
- * SSR paths that never call the client don't crash on missing IndexedDB.
+ * BROWSER-ONLY: importing this module in SSR will throw at call time
+ * because getDb() guards the Dexie singleton. Only import from client
+ * components or inside event handlers.
  */
 
 import type { LexioApiClient } from './client';
+import { LexioDB } from '@/lib/storage/database';
+import { createRepositories } from '@/lib/storage/repositories';
+import { MockApiClient } from './mock-client';
 
 export type { LexioApiClient } from './client';
 export { queryKeys } from './query-keys';
 export { queryClient } from './query-client';
 
 // ---------------------------------------------------------------------------
-// Lazy singleton — instantiated on first access in browser only
+// Singleton — module-level, initialised once per browser session.
+// In tests create a MockApiClient with a test-scoped db directly.
 // ---------------------------------------------------------------------------
 
-let _client: LexioApiClient | null = null;
-
 function buildClient(): LexioApiClient {
-  if (typeof window === 'undefined') {
-    throw new Error(
-      '[lexio/api] apiClient accessed during SSR. ' +
-        'Only import apiClient inside client components or event handlers.',
-    );
-  }
-
-  // Dynamic require keeps Dexie import out of SSR bundle tree.
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { LexioDB } = require('@/lib/storage/database') as typeof import('@/lib/storage/database');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { createRepositories } =
-    require('@/lib/storage/repositories') as typeof import('@/lib/storage/repositories');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { MockApiClient } = require('./mock-client') as typeof import('./mock-client');
-
   const db = new LexioDB();
   const repos = createRepositories(db);
   return new MockApiClient(repos);
 }
 
-/**
- * The active API client. Lazy-initialised on first access.
- * In tests, create a MockApiClient with a test-scoped db directly.
- */
-export function getApiClient(): LexioApiClient {
-  if (!_client) {
-    _client = buildClient();
-  }
-  return _client;
-}
-
-/**
- * Convenience proxy — most callers destructure `apiClient.decks.listMyDecks(...)`.
- * Use getApiClient() when you need to reset between tests.
- */
-export const apiClient = new Proxy({} as LexioApiClient, {
-  get(_target, prop: string) {
-    return getApiClient()[prop as keyof LexioApiClient];
-  },
-});
+// Module-level singleton — safe because this module is only imported client-side.
+// Replace with HttpApiClient in the next iteration when .NET 10 services are scaffolded.
+export const apiClient: LexioApiClient = buildClient();
