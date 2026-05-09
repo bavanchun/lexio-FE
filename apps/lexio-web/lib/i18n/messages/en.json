@@ -84,16 +84,41 @@
     "noAudio": "No audio available"
   },
   "study": {
+    "start": "Start studying",
+    "flip": "Show answer",
     "again": "Again",
     "hard": "Hard",
     "good": "Good",
     "easy": "Easy",
+    "next": "Next card",
+    "exit": "Exit session",
+    "confirmExit": "Exit this session? Progress will be saved.",
     "startSession": "Start studying",
     "endSession": "End session",
     "cardsRemaining": "{count} cards remaining",
     "sessionComplete": "Session complete",
     "newCards": "New cards",
-    "dueCards": "Due for review"
+    "dueCards": "Due for review",
+    "loading": "Loading session…",
+    "achievementUnlocked": "Achievement unlocked: {name}",
+    "empty": {
+      "title": "No cards due",
+      "description": "All cards are up to date. Come back later for your next review."
+    },
+    "summary": {
+      "title": "Session complete",
+      "cardsReviewed": "Cards reviewed",
+      "accuracy": "Accuracy",
+      "timeSpent": "Time spent",
+      "xpEarned": "XP earned",
+      "streak": "Day streak",
+      "achievementsUnlocked": "Achievements unlocked",
+      "backToDashboard": "Back to dashboard",
+      "studyMore": "Study more"
+    },
+    "shortcuts": {
+      "help": "Keyboard shortcuts: Space = flip, 1–4 = rate, Escape = exit"
+    }
   },
   "design": {
     "title": "Lexio design system",
