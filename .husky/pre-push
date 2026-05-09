@@ -1,0 +1,2 @@
+pnpm -r --if-present run typecheck
+pnpm -r --if-present run test --run

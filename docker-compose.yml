@@ -1,0 +1,37 @@
+# Unused in current FE-only iteration; ready for next backend phase.
+# Start services: docker compose up -d postgres redis
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: lexio-postgres
+    environment:
+      POSTGRES_USER: lexio
+      POSTGRES_PASSWORD: lexio_dev
+      POSTGRES_DB: lexio
+    ports:
+      - '5432:5432'
+    volumes:
+      - lexio-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U lexio']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: lexio-redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - lexio-redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  lexio-postgres-data:
+  lexio-redis-data:
