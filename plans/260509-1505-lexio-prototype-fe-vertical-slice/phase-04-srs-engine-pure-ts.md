@@ -10,7 +10,7 @@
 ## Overview
 
 - **Priority:** P1 (heart of the product)
-- **Status:** pending
+- **Status:** completed
 - **Brief:** Implement SM-2 + 4-stage transition + adaptive new-card cap as PURE TYPESCRIPT in `core/use-cases/srs/`. Zero React, zero browser APIs, zero Dexie. Exhaustive Vitest coverage ≥95% branches.
 
 ## Key insights
@@ -116,16 +116,16 @@ UI rates card ─► review-card use case (phase 08) ─► calculate-next-revie
 
 ## Todo
 
-- [ ] `ease-factor.ts` + tests
-- [ ] `interval-calculator.ts` + tests
-- [ ] `stage-transitions.ts` + tests
-- [ ] `calculate-next-review.ts` + tests (12+ cases)
-- [ ] `get-session-queue.ts` + tests (adaptive cap matrix)
-- [ ] `compute-xp.ts` + tests
-- [ ] `update-streak.ts` + tests (DST safe)
-- [ ] `check-achievements.ts` + tests
-- [ ] Coverage ≥95% branches on srs/
-- [ ] Coverage ≥80% on gamification/
+- [x] `ease-factor.ts` + tests
+- [x] `interval-calculator.ts` + tests
+- [x] `stage-transitions.ts` + tests
+- [x] `calculate-next-review.ts` + tests (12+ cases)
+- [x] `get-session-queue.ts` + tests (adaptive cap matrix)
+- [x] `compute-xp.ts` + tests
+- [x] `update-streak.ts` + tests (DST safe)
+- [x] `check-achievements.ts` + tests
+- [x] Coverage ≥95% branches on srs/ (achieved 100%)
+- [x] Coverage ≥80% on gamification/ (achieved 100%)
 
 ## Success criteria
 
