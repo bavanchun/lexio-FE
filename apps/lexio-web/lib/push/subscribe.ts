@@ -51,15 +51,37 @@ export async function subscribeToWebPush(): Promise<PushSubscription | null> {
     return null;
   }
 
-  const sub = await registration.pushManager.subscribe({
-    userVisibleOnly: true,
-    // Cast to ArrayBuffer to satisfy strict lib type — Uint8Array is accepted at runtime
-    applicationServerKey: urlBase64ToUint8Array(vapidKey).buffer as ArrayBuffer,
-  });
+  // Guard: a real VAPID public key is base64url-encoded and at least 86 chars.
+  // Stub values like "stub-key-not-real" would pass the truthiness check above
+  // but cause pushManager.subscribe() to throw InvalidAccessError immediately.
+  const MIN_VAPID_KEY_LENGTH = 86;
+  if (vapidKey.length < MIN_VAPID_KEY_LENGTH) {
+    console.warn(
+      `[push] NEXT_PUBLIC_VAPID_PUBLIC_KEY looks invalid (length ${vapidKey.length} < ${MIN_VAPID_KEY_LENGTH}) — subscription skipped. ` +
+        'Generate a real key pair with: npx web-push generate-vapid-keys',
+    );
+    return null;
+  }
 
-  // STUB: subscription intentionally not posted to backend.
-  // TODO (next iteration): POST sub.toJSON() to /api/push/register
-  console.warn('[push] Subscription created but NOT persisted to server (stub iteration).');
+  try {
+    const sub = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      // TypeScript strict lib types Uint8Array.buffer as ArrayBufferLike (includes
+      // SharedArrayBuffer). The cast is necessary to satisfy PushSubscriptionOptionsInit
+      // which requires ArrayBuffer specifically. At runtime this is always a plain
+      // ArrayBuffer — Uint8Array never wraps SharedArrayBuffer in this path.
+      applicationServerKey: urlBase64ToUint8Array(vapidKey).buffer as ArrayBuffer,
+    });
 
-  return sub;
+    // STUB: subscription intentionally not posted to backend.
+    // TODO (next iteration): POST sub.toJSON() to /api/push/register
+    console.warn('[push] Subscription created but NOT persisted to server (stub iteration).');
+
+    return sub;
+  } catch (err) {
+    // Catches InvalidAccessError (malformed key), NotAllowedError (race on permission),
+    // and server-side rejection during subscribe handshake.
+    console.warn('[push] Subscription failed (likely invalid VAPID key in prototype):', err);
+    return null;
+  }
 }

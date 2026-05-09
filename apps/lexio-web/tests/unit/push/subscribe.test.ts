@@ -46,8 +46,10 @@ describe('subscribeToWebPush', () => {
   const originalNotification = global.Notification;
 
   beforeEach(() => {
-    // Reset env var
-    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY = 'dGVzdC1rZXktZm9yLXVuaXQtdGVzdGluZw'; // valid base64url
+    // Reset env var — use a 86+ char base64url string to pass the length guard.
+    // This is a real-shape (but not cryptographically valid) VAPID public key for testing.
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY =
+      'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U';
   });
 
   afterEach(() => {
@@ -164,5 +166,71 @@ describe('subscribeToWebPush', () => {
     const result = await subscribeToWebPush();
     expect(result).toBe(newSub);
     expect(pushManager.subscribe).toHaveBeenCalledOnce();
+  });
+
+  it('returns null when VAPID key is shorter than 86 chars (stub/invalid key)', async () => {
+    // "stub-key-not-real" is only 18 chars — should be rejected before subscribe()
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY = 'stub-key-not-real';
+
+    const pushManager = makePushManager(null);
+    const registration = makeServiceWorkerRegistration(pushManager);
+
+    Object.defineProperty(global, 'navigator', {
+      value: {
+        onLine: true,
+        serviceWorker: { ready: Promise.resolve(registration) },
+      },
+      writable: true,
+    });
+
+    Object.defineProperty(global, 'Notification', {
+      value: { requestPermission: vi.fn().mockResolvedValue('granted') },
+      writable: true,
+    });
+
+    Object.defineProperty(global, 'PushManager', { value: {}, writable: true });
+
+    const result = await subscribeToWebPush();
+    expect(result).toBeNull();
+    // subscribe() must NOT have been called — invalid key caught before the attempt
+    expect(pushManager.subscribe).not.toHaveBeenCalled();
+  });
+
+  it('returns null when pushManager.subscribe() throws (server rejection / InvalidAccessError)', async () => {
+    // Use a 86+ char key so the length guard passes, but subscribe rejects
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY =
+      'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U';
+
+    const pushManager = {
+      getSubscription: vi.fn().mockResolvedValue(null),
+      subscribe: vi.fn().mockRejectedValue(new DOMException('InvalidAccessError')),
+      permissionState: vi.fn().mockResolvedValue('granted'),
+    } as unknown as PushManager;
+
+    const registration = makeServiceWorkerRegistration(pushManager);
+
+    Object.defineProperty(global, 'navigator', {
+      value: {
+        onLine: true,
+        serviceWorker: { ready: Promise.resolve(registration) },
+      },
+      writable: true,
+    });
+
+    Object.defineProperty(global, 'Notification', {
+      value: { requestPermission: vi.fn().mockResolvedValue('granted') },
+      writable: true,
+    });
+
+    Object.defineProperty(global, 'PushManager', { value: {}, writable: true });
+
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const result = await subscribeToWebPush();
+    expect(result).toBeNull();
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('[push] Subscription failed'),
+      expect.anything(),
+    );
+    warnSpy.mockRestore();
   });
 });
