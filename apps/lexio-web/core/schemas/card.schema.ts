@@ -15,11 +15,27 @@ export const ExerciseTypeSchema = z.enum([
   'context',
 ]);
 
+/** Word family — related forms across parts of speech (all members optional). Nullable, never undefined. */
+export const WordFamilySchema = z
+  .object({
+    verb: z.string().optional(),
+    noun: z.string().optional(),
+    adj: z.string().optional(),
+    adv: z.string().optional(),
+  })
+  .nullable()
+  .default(null);
+
 export const CardSchema = z.object({
   id: z.string(),
   deckId: z.string(),
   word: z.string().min(1),
-  ipa: z.string().nullable(),
+  /** IPA — US variant */
+  ipaUs: z.string().nullable(),
+  /** IPA — UK variant */
+  ipaUk: z.string().nullable(),
+  /** @deprecated use ipaUs/ipaUk — kept for seed-loader backwards compat */
+  ipa: z.string().nullable().optional(),
   definition: z.string().min(1),
   exampleSentence: z.string().nullable(),
   exampleTranslation: z.string().nullable(),
@@ -29,6 +45,12 @@ export const CardSchema = z.object({
   tags: z.array(z.string()),
   cefrLevel: CefrLevelSchema.nullable(),
   exerciseTypes: z.array(ExerciseTypeSchema),
+  collocations: z.array(z.string()),
+  synonyms: z.array(z.string()),
+  antonyms: z.array(z.string()),
+  wordFamily: WordFamilySchema,
+  etymology: z.string().nullable(),
+  frequencyRank: z.number().int().positive().nullable(),
   createdBy: z.string(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),

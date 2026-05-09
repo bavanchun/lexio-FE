@@ -15,9 +15,22 @@ import { z } from 'zod';
 // Seed card schema — subset of CardSchema (id/deckId/createdBy added by loader)
 // ---------------------------------------------------------------------------
 
+const WordFamilySchema = z
+  .object({
+    verb: z.string().optional(),
+    noun: z.string().optional(),
+    adj: z.string().optional(),
+    adv: z.string().optional(),
+  })
+  .nullable()
+  .optional(); // optional at seed level — seed cards may omit it
+
 const SeedCardSchema = z.object({
   word: z.string().min(1),
-  ipa: z.string().nullable(),
+  /** Legacy single-IPA (optional — prefer ipaUs/ipaUk) */
+  ipa: z.string().nullable().optional(),
+  ipaUs: z.string().nullable().optional(),
+  ipaUk: z.string().nullable().optional(),
   definition: z.string().min(1),
   exampleSentence: z.string().nullable(),
   exampleTranslation: z.string().nullable(),
@@ -29,6 +42,12 @@ const SeedCardSchema = z.object({
   exerciseTypes: z
     .array(z.enum(['flashcard', 'multiple_choice', 'type', 'listening', 'context']))
     .min(1),
+  collocations: z.array(z.string()).optional(),
+  synonyms: z.array(z.string()).optional(),
+  antonyms: z.array(z.string()).optional(),
+  wordFamily: WordFamilySchema,
+  etymology: z.string().nullable().optional(),
+  frequencyRank: z.number().int().positive().nullable().optional(),
 });
 
 const SeedFileSchema = z.object({

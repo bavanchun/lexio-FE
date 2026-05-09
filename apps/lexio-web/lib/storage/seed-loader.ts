@@ -24,7 +24,12 @@ export const STUB_DECK_ID = 'seed-deck-it-tech-001';
 
 interface SeedCard {
   word: string;
-  ipa: string | null;
+  /** Legacy single-IPA field — still accepted for backwards compat */
+  ipa?: string | null;
+  /** IPA — US variant (preferred) */
+  ipaUs?: string | null;
+  /** IPA — UK variant */
+  ipaUk?: string | null;
   definition: string;
   exampleSentence: string | null;
   exampleTranslation: string | null;
@@ -34,6 +39,18 @@ interface SeedCard {
   tags: string[];
   cefrLevel: 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2' | null;
   exerciseTypes: string[];
+  /** Common collocations (§4.2) */
+  collocations?: string[];
+  /** Synonyms in context (§4.2) */
+  synonyms?: string[];
+  /** Antonyms in context (§4.2) */
+  antonyms?: string[];
+  /** Related word forms (§4.2) */
+  wordFamily?: { verb?: string; noun?: string; adj?: string; adv?: string } | null;
+  /** Word origin (§4.2) */
+  etymology?: string | null;
+  /** Corpus frequency rank (§4.2) */
+  frequencyRank?: number | null;
 }
 
 interface SeedFile {
@@ -95,7 +112,10 @@ export async function seedIfFresh(db: LexioDB): Promise<SeedResult> {
     id: `seed-card-${String(i + 1).padStart(3, '0')}`,
     deckId: STUB_DECK_ID,
     word: c.word,
-    ipa: c.ipa,
+    // Prefer split ipaUs/ipaUk; fall back to legacy ipa for old seed files
+    ipa: c.ipa ?? null,
+    ipaUs: c.ipaUs ?? c.ipa ?? null,
+    ipaUk: c.ipaUk ?? null,
     definition: c.definition,
     exampleSentence: c.exampleSentence,
     exampleTranslation: c.exampleTranslation,
@@ -105,6 +125,12 @@ export async function seedIfFresh(db: LexioDB): Promise<SeedResult> {
     tags: c.tags,
     cefrLevel: c.cefrLevel,
     exerciseTypes: c.exerciseTypes,
+    collocations: c.collocations ?? [],
+    synonyms: c.synonyms ?? [],
+    antonyms: c.antonyms ?? [],
+    wordFamily: c.wordFamily ?? null,
+    etymology: c.etymology ?? null,
+    frequencyRank: c.frequencyRank ?? null,
     createdBy: STUB_USER_ID,
     createdAt: now,
     updatedAt: now,

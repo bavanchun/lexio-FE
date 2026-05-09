@@ -3,9 +3,9 @@
  * Extracted to keep card-preview-drawer.tsx under 200 LOC.
  *
  * Renders all available §4.2 fields from the Card entity.
- * Fields not present in the current entity schema (e.g. IPA US/UK split,
- * collocations, word family) are omitted — they will appear once the
- * backend exposes them.
+ * File is split at the 200-line boundary: extended fields (IPA US/UK, collocations,
+ * synonyms, antonyms, word family, etymology, frequency rank) are rendered by
+ * card-detail-extended-fields.tsx and composed here.
  */
 import { Volume2Icon } from 'lucide-react';
 import { Badge } from '@/shared/components/ui/badge';
@@ -13,6 +13,7 @@ import { Button } from '@/shared/components/ui/button';
 // eslint-disable-next-line boundaries/dependencies
 import { useAudioPlayback } from '../hooks/use-audio-playback';
 import type { Card } from '@/core/entities/card';
+import { CardDetailExtendedFields } from './card-detail-extended-fields';
 
 interface AudioButtonProps {
   url: string | null;
@@ -64,16 +65,37 @@ export function CardDetailFields({ card }: CardDetailFieldsProps) {
         )}
       </div>
 
-      {/* IPA — rendered in Charis SIL via --font-ipa CSS variable */}
-      {card.ipa && (
+      {/* IPA US / UK — rendered in Charis SIL via --font-ipa CSS variable */}
+      {(card.ipaUs || card.ipaUk) && (
         <div>
           <p className="mb-1 text-xs font-medium text-muted-foreground uppercase tracking-wide">
             Pronunciation
           </p>
-          {/* font-ipa class maps to var(--font-ipa) = Charis SIL */}
-          <span className="font-ipa text-lg text-foreground" aria-label={`IPA: ${card.ipa}`}>
-            /{card.ipa}/
-          </span>
+          <div className="flex flex-wrap gap-4">
+            {card.ipaUs && (
+              <span className="flex flex-col gap-0.5">
+                <span className="text-xs text-muted-foreground">US</span>
+                {/* font-ipa class maps to var(--font-ipa) = Charis SIL */}
+                <span
+                  className="font-ipa text-lg text-foreground"
+                  aria-label={`IPA US: ${card.ipaUs}`}
+                >
+                  /{card.ipaUs}/
+                </span>
+              </span>
+            )}
+            {card.ipaUk && (
+              <span className="flex flex-col gap-0.5">
+                <span className="text-xs text-muted-foreground">UK</span>
+                <span
+                  className="font-ipa text-lg text-foreground"
+                  aria-label={`IPA UK: ${card.ipaUk}`}
+                >
+                  /{card.ipaUk}/
+                </span>
+              </span>
+            )}
+          </div>
         </div>
       )}
 
@@ -112,7 +134,7 @@ export function CardDetailFields({ card }: CardDetailFieldsProps) {
         </div>
       )}
 
-      {/* Tags (collocations/synonyms stand-in until extended schema) */}
+      {/* Tags */}
       {hasTags && (
         <div>
           <p className="mb-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -128,7 +150,10 @@ export function CardDetailFields({ card }: CardDetailFieldsProps) {
         </div>
       )}
 
-      {/* Meta row: CEFR + frequency placeholder */}
+      {/* Extended §4.2 fields: collocations, synonyms, antonyms, word family, etymology, freq rank */}
+      <CardDetailExtendedFields card={card} />
+
+      {/* Meta row */}
       <div className="flex flex-wrap gap-4 border-t pt-3">
         {card.cefrLevel && (
           <div className="flex flex-col gap-0.5">
@@ -140,6 +165,12 @@ export function CardDetailFields({ card }: CardDetailFieldsProps) {
           <span className="text-xs text-muted-foreground">Exercise types</span>
           <span className="text-sm font-medium">{card.exerciseTypes.join(', ') || '—'}</span>
         </div>
+        {card.frequencyRank != null && (
+          <div className="flex flex-col gap-0.5">
+            <span className="text-xs text-muted-foreground">Freq. rank</span>
+            <span className="text-sm font-medium text-muted-foreground">#{card.frequencyRank}</span>
+          </div>
+        )}
       </div>
     </div>
   );
