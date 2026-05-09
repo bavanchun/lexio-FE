@@ -26,7 +26,7 @@ vi.mock('@/lib/api', () => ({
 }));
 
 // Import hook after mock registration (Vitest hoists vi.mock above all imports)
-// eslint-disable-next-line boundaries/dependencies
+
 import { useDecks } from '@/features/vocabulary/services/use-decks';
 // Import the mocked module to access mock functions
 import { apiClient } from '@/lib/api';

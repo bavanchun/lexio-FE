@@ -20,7 +20,6 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 
-// eslint-disable-next-line boundaries/dependencies
 import { useAchievements, CANONICAL_BADGES } from '@/features/statistics/services/stats-queries';
 import { apiClient } from '@/lib/api';
 

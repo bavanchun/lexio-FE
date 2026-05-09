@@ -22,7 +22,6 @@ vi.mock('@/shared/components/ui/dialog', () => ({
   DialogTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
 }));
 
-// eslint-disable-next-line boundaries/dependencies
 import { Heatmap } from '@/features/statistics/components/heatmap';
 
 // ─────────────────────────────────────────────────────────────────────────────

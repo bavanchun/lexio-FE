@@ -26,7 +26,6 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 
-// eslint-disable-next-line boundaries/dependencies
 import { useDashboardStats } from '@/features/statistics/services/stats-queries';
 import { apiClient } from '@/lib/api';
 
