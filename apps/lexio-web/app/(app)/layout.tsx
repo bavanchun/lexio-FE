@@ -13,6 +13,7 @@
  */
 import { useRouter } from 'next/navigation';
 import { DbInitProvider } from '@/shared/components/providers/db-init-provider';
+import { QueryProvider } from '@/shared/components/providers/query-provider';
 import { RequireAuth } from '@/features/auth';
 import { useAuthStore } from '@/features/auth';
 import { AppShell } from '@/shared/components/layout/app-shell';
@@ -36,10 +37,12 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <DbInitProvider>
-      <RequireAuth>
-        <AuthenticatedShell>{children}</AuthenticatedShell>
-      </RequireAuth>
-    </DbInitProvider>
+    <QueryProvider>
+      <DbInitProvider>
+        <RequireAuth>
+          <AuthenticatedShell>{children}</AuthenticatedShell>
+        </RequireAuth>
+      </DbInitProvider>
+    </QueryProvider>
   );
 }
