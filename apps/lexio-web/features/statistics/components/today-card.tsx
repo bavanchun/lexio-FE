@@ -13,10 +13,13 @@ interface TodayCardProps {
   dueCount: number;
   newCount: number;
   estimatedMinutes: number;
+  /** Deck ID to start studying. Required to build correct /study/new?deckId= URL. */
+  deckId?: string;
 }
 
-export function TodayCard({ dueCount, newCount, estimatedMinutes }: TodayCardProps) {
+export function TodayCard({ dueCount, newCount, estimatedMinutes, deckId }: TodayCardProps) {
   const hasWork = dueCount > 0 || newCount > 0;
+  const studyHref = deckId ? `/study/new?deckId=${deckId}` : '/decks';
 
   return (
     <Card className="border shadow-none">
@@ -52,8 +55,8 @@ export function TodayCard({ dueCount, newCount, estimatedMinutes }: TodayCardPro
         </div>
 
         {hasWork && (
-          <Button asChild size="sm" className="mt-1 w-full">
-            <Link href="/study/new">Start studying</Link>
+          <Button asChild size="sm" className="mt-1 w-full" data-testid="start-studying-btn">
+            <Link href={studyHref}>Start studying</Link>
           </Button>
         )}
       </CardContent>

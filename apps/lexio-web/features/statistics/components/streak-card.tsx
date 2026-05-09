@@ -17,7 +17,7 @@ export function StreakCard({ current, longest }: StreakCardProps) {
   const isActive = current > 0;
 
   return (
-    <Card className="border shadow-none">
+    <Card className="border shadow-none" data-testid="streak-card">
       <CardContent className="flex flex-col gap-2 p-4">
         <div className="flex items-center gap-2">
           <Flame
@@ -27,7 +27,9 @@ export function StreakCard({ current, longest }: StreakCardProps) {
           <span className="text-sm text-muted-foreground">Day streak</span>
         </div>
         <div className="flex items-baseline gap-1">
-          <span className="text-3xl font-medium tabular-nums">{current}</span>
+          <span className="text-3xl font-medium tabular-nums" data-testid="streak-current">
+            {current}
+          </span>
           <span className="text-sm text-muted-foreground">days</span>
         </div>
         <p className="text-xs text-muted-foreground">Best: {longest} days</p>

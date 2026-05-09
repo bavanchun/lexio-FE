@@ -4,7 +4,7 @@
  * Uses mocked apiClient to avoid Dexie/IndexedDB dependency.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 // ── next/navigation mock ──────────────────────────────────────────────────────
 vi.mock('next/navigation', () => ({
@@ -21,11 +21,10 @@ vi.mock('next/link', () => ({
   ),
 }));
 
-// eslint-disable-next-line boundaries/dependencies
 import { TodayCard } from '@/features/statistics/components/today-card';
-// eslint-disable-next-line boundaries/dependencies
+
 import { StreakCard } from '@/features/statistics/components/streak-card';
-// eslint-disable-next-line boundaries/dependencies
+
 import { XpCard } from '@/features/statistics/components/xp-card';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -39,11 +38,18 @@ describe('TodayCard', () => {
     expect(screen.getByText('6 min')).toBeInTheDocument();
   });
 
-  it('shows "Start studying" CTA when there is work to do', () => {
+  it('shows "Start studying" CTA with deckId when there is work to do', () => {
+    render(<TodayCard dueCount={5} newCount={0} estimatedMinutes={1} deckId="deck-001" />);
+
+    const link = screen.getByRole('link', { name: /start studying/i });
+    expect(link).toHaveAttribute('href', '/study/new?deckId=deck-001');
+  });
+
+  it('falls back to /decks when no deckId provided', () => {
     render(<TodayCard dueCount={5} newCount={0} estimatedMinutes={1} />);
 
     const link = screen.getByRole('link', { name: /start studying/i });
-    expect(link).toHaveAttribute('href', '/study/new');
+    expect(link).toHaveAttribute('href', '/decks');
   });
 
   it('hides CTA when both due and new are zero', () => {

@@ -5,6 +5,7 @@ import { inter, jetbrainsMono, charisSil } from '@/shared/fonts';
 import { ThemeProvider } from '@/shared/theme/theme-provider';
 import { Toaster } from '@/shared/components/ui/sonner';
 import { TooltipProvider } from '@/shared/components/ui/tooltip';
+import { WebVitalsReporter } from '@/shared/components/providers/web-vitals-reporter';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -31,6 +32,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       className={`${inter.variable} ${jetbrainsMono.variable} ${charisSil.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        <WebVitalsReporter />
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
             <TooltipProvider>
