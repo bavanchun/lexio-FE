@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
 import withSerwistInit from '@serwist/next';
+import withBundleAnalyzerInit from '@next/bundle-analyzer';
 
 /**
  * next-intl v4 plugin wires the request config at i18n/request.ts.
@@ -8,6 +9,15 @@ import withSerwistInit from '@serwist/next';
  * Doc: https://next-intl.dev/docs/getting-started/app-router/without-i18n-routing
  */
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
+
+/**
+ * Bundle analyzer — enabled only when ANALYZE=true env var is set.
+ * Usage: ANALYZE=true pnpm build
+ * Output: .next/analyze/client.html and server.html
+ */
+const withBundleAnalyzer = withBundleAnalyzerInit({
+  enabled: process.env.ANALYZE === 'true',
+});
 
 /**
  * Serwist service worker plugin.
@@ -56,4 +66,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSerwist(withNextIntl(nextConfig));
+export default withSerwist(withBundleAnalyzer(withNextIntl(nextConfig)));
