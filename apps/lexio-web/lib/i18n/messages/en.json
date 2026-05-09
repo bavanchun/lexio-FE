@@ -1,0 +1,55 @@
+{
+  "app": {
+    "title": "Lexio",
+    "tagline": "Language learning, reimagined"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "study": "Study",
+    "vocabulary": "Vocabulary",
+    "decks": "Decks",
+    "statistics": "Statistics",
+    "settings": "Settings",
+    "signIn": "Sign in",
+    "signOut": "Sign out"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "confirm": "Confirm"
+  },
+  "study": {
+    "again": "Again",
+    "hard": "Hard",
+    "good": "Good",
+    "easy": "Easy",
+    "startSession": "Start studying",
+    "endSession": "End session",
+    "cardsRemaining": "{count} cards remaining",
+    "sessionComplete": "Session complete",
+    "newCards": "New cards",
+    "dueCards": "Due for review"
+  },
+  "dashboard": {
+    "greeting": "Welcome back",
+    "streakLabel": "Day streak",
+    "xpLabel": "Total XP",
+    "levelLabel": "Level",
+    "reviewsDueLabel": "Reviews due",
+    "recentActivity": "Recent activity"
+  },
+  "design": {
+    "title": "Lexio design system",
+    "subtitle": "Phase-02 approval gate · §12 brand identity"
+  }
+}
