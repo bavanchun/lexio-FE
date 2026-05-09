@@ -18,7 +18,7 @@ vi.mock('next/navigation', () => ({
 
 // ── next-intl mock ────────────────────────────────────────────────────────────
 vi.mock('next-intl', () => ({
-  useTranslations: (ns?: string) => {
+  useTranslations: () => {
     const keys: Record<string, string> = {
       signIn: 'Sign in to Lexio',
       signInDescription: 'Email and display name only — this prototype does not store passwords.',

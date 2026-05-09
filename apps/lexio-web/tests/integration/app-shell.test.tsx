@@ -15,7 +15,7 @@ vi.mock('next/navigation', () => ({
 
 // ── next-intl mock ────────────────────────────────────────────────────────────
 vi.mock('next-intl', () => ({
-  useTranslations: (ns?: string) => {
+  useTranslations: () => {
     const keys: Record<string, string> = {
       dashboard: 'Dashboard',
       decks: 'Decks',

@@ -78,19 +78,6 @@ async function seedCards(db: LexioDB, count: number): Promise<{ cardIds: CardId[
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
-// Unique DB name counter — fake-indexeddb shares the same in-memory store for
-// identical DB names, so each test needs a unique name to start clean.
-let dbSeq = 0;
-
-/** Creates a fresh LexioDB with a unique name by monkey-patching the constructor arg. */
-function freshDb(): LexioDB {
-  const db = new LexioDB();
-  // Override the internal name so fake-indexeddb allocates a new store
-  (db as unknown as { name: string }).name = `lexio-test-${++dbSeq}`;
-  // Re-open with the new name by deleting and re-creating the underlying IDB
-  return db;
-}
-
 describe('Flashcard study flow — integration', () => {
   let db: LexioDB;
   let repos: ReturnType<typeof createRepositories>;
@@ -225,7 +212,6 @@ describe('Flashcard study flow — integration', () => {
 
     expect(queue.length).toBeGreaterThan(0);
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const firstItem = queue[0]!;
     await submitReview(
       {
@@ -267,7 +253,6 @@ describe('Flashcard study flow — integration', () => {
 
     expect(queue.length).toBeGreaterThan(0);
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const result = await submitReview(
       {
         userCardRepo: repos.userCards,
@@ -309,7 +294,7 @@ describe('Flashcard study flow — integration', () => {
     );
 
     expect(queue.length).toBeGreaterThan(0);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     const originalCard = queue[0]!.userCard;
     expect(originalCard.stage).toBe('New');
 
