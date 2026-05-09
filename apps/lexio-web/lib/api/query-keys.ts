@@ -25,5 +25,8 @@ export const queryKeys = {
     streak: (userId: string) => ['stats', userId, 'streak'] as const,
     xp: (userId: string) => ['stats', userId, 'xp'] as const,
     achievements: (userId: string) => ['stats', userId, 'achievements'] as const,
+    dashboard: (userId: string) => ['stats', userId, 'dashboard'] as const,
+    heatmap: (userId: string, from: string, to: string) =>
+      ['stats', userId, 'heatmap', from, to] as const,
   },
 } as const;
