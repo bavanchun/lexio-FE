@@ -9,7 +9,7 @@
 ## Overview
 
 - **Priority:** P2
-- **Status:** pending
+- **Status:** completed
 - **Brief:** Deck list at `/decks` and deck detail at `/decks/[deckId]` showing the seed deck's 30 cards. **Read-only this iteration** — no create/edit (KISS for prototype).
 
 ## Key insights
@@ -74,13 +74,13 @@ features/vocabulary/
 
 ## Todo
 
-- [ ] deck-queries service
-- [ ] use-decks, use-deck-detail hooks
-- [ ] DeckList + DeckListItem
-- [ ] DeckDetail
-- [ ] CardTable + CardRow + StageBadge
-- [ ] Routes wired
-- [ ] Integration test for DeckList
+- [x] deck-queries service (use-decks.ts, use-deck.ts, use-deck-cards.ts)
+- [x] use-decks, use-deck-detail hooks
+- [x] DeckGrid + DeckCard components
+- [x] CardsTable + CardPreviewDrawer + CardDetailFields + StageBadge
+- [x] Routes wired (/decks, /decks/[id])
+- [x] Integration tests: decks-list, deck-detail
+- [x] Unit test: use-decks hook
 
 ## Success criteria
 

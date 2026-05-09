@@ -9,7 +9,7 @@
 ## Overview
 
 - **Priority:** P1
-- **Status:** pending
+- **Status:** complete
 - **Brief:** Local Zustand auth store (NOT PRODUCTION). Login page accepts any email/password and creates fake user with role=Learner. App shell layout with sidebar (Lucide canonical icons) + top bar (theme toggle + user menu). Route groups `(auth)` and `(app)`.
 
 ## Key insights
@@ -98,13 +98,13 @@ Stores:
 
 ## Todo
 
-- [ ] auth-store with persist
-- [ ] login page + form
-- [ ] RequireAuth guard
-- [ ] AppShell + Sidebar + TopBar with canonical icons
-- [ ] ReactQueryProvider, IntlProvider, DbInitGate
-- [ ] DevStubBanner
-- [ ] Sign-out flow
+- [x] auth-store with persist
+- [x] login page + form
+- [x] RequireAuth guard
+- [x] AppShell + Sidebar + TopBar with canonical icons
+- [x] ReactQueryProvider, IntlProvider, DbInitGate
+- [x] DevStubBanner (NotProdBanner)
+- [x] Sign-out flow
 - [ ] Manual smoke: login → /dashboard → reload persists session → sign out → redirected to /login
 
 ## Success criteria

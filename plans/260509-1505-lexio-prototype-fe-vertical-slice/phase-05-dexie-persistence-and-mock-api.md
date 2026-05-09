@@ -11,7 +11,7 @@
 ## Overview
 
 - **Priority:** P1
-- **Status:** pending
+- **Status:** complete
 - **Brief:** Define Dexie schema mirroring doc §7.2. Implement repository adapters (Dexie) for each `core/ports/` interface. Build seed loader (~30 IT/Tech cards JSON). Define a thin mock-api layer in `lib/api/` so future swap to real .NET services touches only this file.
 
 ## Key insights
@@ -82,14 +82,14 @@ Data shapes match `core/entities/*` exactly. Repositories serialize Date↔numbe
 
 ## Todo
 
-- [ ] Dexie `db.ts` v1 schema
-- [ ] All 6 repositories
-- [ ] `seed-loader.ts` idempotent
-- [ ] 30-card seed JSON validated by Zod
-- [ ] `lib/api/` wrappers + queryKeys
-- [ ] `db-init.ts` client-only gate
-- [ ] Repo tests with fake-indexeddb
-- [ ] Seed loader test (idempotence)
+- [x] Dexie `db.ts` v1 schema
+- [x] All 6 repositories (8 total: card, deck, user-card, review, session, streak, user-xp, achievement)
+- [x] `seed-loader.ts` idempotent
+- [x] 30-card seed JSON validated by Zod
+- [x] `lib/api/` wrappers + queryKeys
+- [x] `db-init.ts` client-only gate
+- [x] Repo tests with fake-indexeddb
+- [x] Seed loader test (idempotence)
 
 ## Success criteria
 
