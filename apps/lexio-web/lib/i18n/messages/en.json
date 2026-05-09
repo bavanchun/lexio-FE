@@ -8,10 +8,41 @@
     "study": "Study",
     "vocabulary": "Vocabulary",
     "decks": "Decks",
+    "stats": "Stats",
     "statistics": "Statistics",
+    "achievements": "Achievements",
+    "community": "Community",
     "settings": "Settings",
     "signIn": "Sign in",
     "signOut": "Sign out"
+  },
+  "auth": {
+    "signIn": "Sign in to Lexio",
+    "signOut": "Sign out",
+    "signingIn": "Signing in…",
+    "email": "Email",
+    "displayName": "Display name",
+    "signInButton": "Continue",
+    "signInDescription": "Email and display name only — this prototype does not store passwords.",
+    "notProdBanner": "Stub authentication — not for production",
+    "requiredField": "This field is required",
+    "invalidEmail": "Enter a valid email address"
+  },
+  "shell": {
+    "streak": "Day streak",
+    "level": "Level",
+    "xp": "XP",
+    "signOut": "Sign out"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "comingSoon": "Full dashboard coming in phase 09.",
+    "greeting": "Welcome back",
+    "streakLabel": "Day streak",
+    "xpLabel": "Total XP",
+    "levelLabel": "Level",
+    "reviewsDueLabel": "Reviews due",
+    "recentActivity": "Recent activity"
   },
   "common": {
     "save": "Save",
@@ -39,14 +70,6 @@
     "sessionComplete": "Session complete",
     "newCards": "New cards",
     "dueCards": "Due for review"
-  },
-  "dashboard": {
-    "greeting": "Welcome back",
-    "streakLabel": "Day streak",
-    "xpLabel": "Total XP",
-    "levelLabel": "Level",
-    "reviewsDueLabel": "Reviews due",
-    "recentActivity": "Recent activity"
   },
   "design": {
     "title": "Lexio design system",
