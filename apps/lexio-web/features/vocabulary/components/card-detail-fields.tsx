@@ -13,6 +13,7 @@ import { Button } from '@/shared/components/ui/button';
 // eslint-disable-next-line boundaries/dependencies
 import { useAudioPlayback } from '../hooks/use-audio-playback';
 import type { Card } from '@/core/entities/card';
+// eslint-disable-next-line boundaries/dependencies
 import { CardDetailExtendedFields } from './card-detail-extended-fields';
 
 interface AudioButtonProps {
