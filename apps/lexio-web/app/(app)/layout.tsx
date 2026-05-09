@@ -18,6 +18,7 @@ import { RequireAuth } from '@/features/auth';
 import { useAuthStore } from '@/features/auth';
 import { useDashboardStats } from '@/features/statistics';
 import { AppShell } from '@/shared/components/layout/app-shell';
+import { NotificationToggle } from '@/features/notifications/components/notification-toggle';
 
 /** Stub user ID — matches seed-loader.ts STUB_USER_ID. app/ cannot import lib/ directly. */
 const FALLBACK_USER_ID = 'stub-user-000';
@@ -42,6 +43,7 @@ function AuthenticatedShell({ children }: { children: React.ReactNode }) {
       onSignOut={handleSignOut}
       streak={statsData?.streak.current}
       level={statsData?.xp.level}
+      dropdownExtras={<NotificationToggle />}
     >
       {children}
     </AppShell>

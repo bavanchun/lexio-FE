@@ -6,8 +6,13 @@
  *
  * Receives user display name and signOut callback via props (no direct features/ import)
  * so shared/ boundary is respected — caller (app/ layout) injects auth context.
+ *
+ * dropdownExtras: optional render prop allowing the app/ layer to inject additional
+ * DropdownMenuItems (e.g. NotificationToggle from features/) without violating
+ * the shared → features boundary rule.
  */
 import { useTranslations } from 'next-intl';
+import { Download } from 'lucide-react';
 import { ThemeToggle } from '@/shared/components/theme-toggle';
 import { StreakIcon, XpIcon, ChevronDownIcon, SignOutIcon, SettingsIcon } from '@/shared/icons';
 import { Button } from '@/shared/components/ui/button';
@@ -18,6 +23,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
+import { useInstallPrompt } from '@/shared/components/install-prompt';
 import Link from 'next/link';
 
 interface TopBarProps {
@@ -27,6 +33,12 @@ interface TopBarProps {
   streak?: number;
   /** Current XP level — injected from (app)/layout.tsx via features/statistics. Defaults to 1. */
   level?: number;
+  /**
+   * Additional DropdownMenuItems rendered after the Settings item.
+   * Use this to inject features-layer items (e.g. NotificationToggle) from the
+   * app/ layer without creating a shared → features boundary violation.
+   */
+  dropdownExtras?: React.ReactNode;
 }
 
 /** Derive two-letter initials from a display name. */
@@ -39,9 +51,16 @@ function getInitials(displayName: string): string {
     .join('');
 }
 
-export function TopBar({ displayName, onSignOut, streak = 0, level = 1 }: TopBarProps) {
+export function TopBar({
+  displayName,
+  onSignOut,
+  streak = 0,
+  level = 1,
+  dropdownExtras,
+}: TopBarProps) {
   const t = useTranslations();
   const initials = getInitials(displayName);
+  const { canInstall, install } = useInstallPrompt();
 
   return (
     <header className="flex h-14 items-center justify-end gap-3 border-b border-border bg-card px-4">
@@ -75,13 +94,21 @@ export function TopBar({ displayName, onSignOut, streak = 0, level = 1 }: TopBar
             <ChevronDownIcon className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-44">
+        <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuItem asChild>
             <Link href="/settings" className="flex items-center gap-2">
               <SettingsIcon className="h-4 w-4" strokeWidth={1.5} />
               {t('nav.settings')}
             </Link>
           </DropdownMenuItem>
+          {/* Features-layer extras injected from app/ layer (boundary-safe render prop) */}
+          {dropdownExtras}
+          {canInstall && (
+            <DropdownMenuItem onClick={install} className="flex items-center gap-2">
+              <Download className="h-4 w-4" strokeWidth={1.5} />
+              Install Lexio
+            </DropdownMenuItem>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={onSignOut}
