@@ -7,7 +7,7 @@
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import Dexie from 'dexie';
-import { LexioDB } from '@/lib/storage/database';
+import { LexioDB, withReviewTransaction } from '@/lib/storage/database';
 import { createRepositories } from '@/lib/storage/repositories';
 import { startSession } from '@/features/learning/use-cases/start-session';
 import { submitReview } from '@/features/learning/use-cases/submit-review';
@@ -138,6 +138,7 @@ describe('Flashcard study flow — integration', () => {
           streakRepo: repos.streaks,
           userXpRepo: repos.userXp,
           achievementRepo: repos.achievements,
+          runInTransaction: <T>(fn: () => Promise<T>) => withReviewTransaction(db, fn),
         },
         {
           userCard: item.userCard,
@@ -183,6 +184,7 @@ describe('Flashcard study flow — integration', () => {
           streakRepo: repos.streaks,
           userXpRepo: repos.userXp,
           achievementRepo: repos.achievements,
+          runInTransaction: <T>(fn: () => Promise<T>) => withReviewTransaction(db, fn),
         },
         {
           userCard: item.userCard,
@@ -229,6 +231,7 @@ describe('Flashcard study flow — integration', () => {
         streakRepo: repos.streaks,
         userXpRepo: repos.userXp,
         achievementRepo: repos.achievements,
+        runInTransaction: <T>(fn: () => Promise<T>) => withReviewTransaction(db, fn),
       },
       {
         userCard: firstItem.userCard,
@@ -269,6 +272,7 @@ describe('Flashcard study flow — integration', () => {
         streakRepo: repos.streaks,
         userXpRepo: repos.userXp,
         achievementRepo: repos.achievements,
+        runInTransaction: <T>(fn: () => Promise<T>) => withReviewTransaction(db, fn),
       },
       {
         userCard: queue[0]!.userCard,
@@ -314,6 +318,7 @@ describe('Flashcard study flow — integration', () => {
         streakRepo: repos.streaks,
         userXpRepo: repos.userXp,
         achievementRepo: repos.achievements,
+        runInTransaction: <T>(fn: () => Promise<T>) => withReviewTransaction(db, fn),
       },
       {
         userCard: originalCard,

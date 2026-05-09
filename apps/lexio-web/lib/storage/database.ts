@@ -237,3 +237,36 @@ export function getDb(): LexioDB {
   }
   return db;
 }
+
+// ---------------------------------------------------------------------------
+// Transaction helper
+// ---------------------------------------------------------------------------
+
+/**
+ * Wraps multiple Dexie writes in a single 'rw' transaction over the
+ * tables used by submit-review (userCards, reviews, streaks, userXp,
+ * achievements, sessions).
+ *
+ * If any write inside fn() throws, Dexie aborts the entire transaction
+ * and all prior writes in the same call are rolled back.
+ *
+ * Keep this in lib/ — do NOT import it from core/ or features/use-cases/.
+ * Inject it as a dependency to keep core/ framework-free.
+ */
+export async function withReviewTransaction<T>(
+  instance: LexioDB,
+  fn: () => Promise<T>,
+): Promise<T> {
+  return instance.transaction(
+    'rw',
+    [
+      instance.userCards,
+      instance.reviews,
+      instance.streaks,
+      instance.userXp,
+      instance.achievements,
+      instance.sessions,
+    ],
+    fn,
+  );
+}

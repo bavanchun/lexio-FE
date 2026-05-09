@@ -32,10 +32,13 @@ import { submitReview } from '../use-cases/submit-review';
 // Repositories are accessed through a lazy import to keep SSR safe.
 // The hook is 'use client' so this runs only in browser.
 async function getRepos() {
-  const { LexioDB } = await import('@/lib/storage/database');
+  const { LexioDB, withReviewTransaction } = await import('@/lib/storage/database');
   const { createRepositories } = await import('@/lib/storage/repositories');
   const db = new LexioDB();
-  return createRepositories(db);
+  const repos = createRepositories(db);
+  // Bind the transaction helper to this db instance
+  const runInTransaction = <T>(fn: () => Promise<T>) => withReviewTransaction(db, fn);
+  return { ...repos, runInTransaction };
 }
 
 interface UseStudySessionOptions {
@@ -197,6 +200,7 @@ export function useStudySession({
             streakRepo: repos.streaks,
             userXpRepo: repos.userXp,
             achievementRepo: repos.achievements,
+            runInTransaction: repos.runInTransaction,
           },
           {
             userCard: currentItem.userCard,

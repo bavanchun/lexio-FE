@@ -1,8 +1,14 @@
 /**
  * submit-review — FE orchestrator for persisting a single card review.
  * Composes: calculateNextReview, computeXp, updateStreak, checkAchievements.
- * Runs all Dexie writes in a single logical transaction (sequential awaits —
- * Dexie lite transaction not needed since each repo call is independent).
+ *
+ * All Dexie writes are wrapped in a single 'rw' transaction via the injected
+ * runInTransaction dependency. If any write fails mid-flow, Dexie aborts the
+ * entire transaction and no partial writes are committed.
+ *
+ * runInTransaction is injected (not imported) to keep features/learning/
+ * free of direct Dexie/lib/ imports — the dependency is wired by the mock
+ * client (lib/mock-client) or the real Dexie client at the app layer.
  */
 
 import type { IUserCardRepository } from '@/core/ports/user-card-repository';
@@ -28,6 +34,13 @@ export interface SubmitReviewDeps {
   streakRepo: IStreakRepository;
   userXpRepo: IUserXpRepository;
   achievementRepo: IAchievementRepository;
+  /**
+   * Wraps all writes in a single atomic transaction.
+   * Injected from lib/storage/database.withReviewTransaction (Dexie)
+   * or a no-op pass-through in unit tests (in-memory repos are already atomic).
+   * Signature mirrors Dexie.transaction — fn runs inside the transaction scope.
+   */
+  runInTransaction: <T>(fn: () => Promise<T>) => Promise<T>;
 }
 
 export interface SubmitReviewInput {
@@ -54,37 +67,38 @@ export interface SubmitReviewOutput {
 /**
  * Persists a review event and updates all derived state:
  * UserCard SRS fields, streak, XP, achievements.
+ *
+ * All writes execute inside a single Dexie 'rw' transaction (via
+ * deps.runInTransaction). If any write fails, the entire transaction is
+ * aborted — no partial state is committed.
  */
 export async function submitReview(
   deps: SubmitReviewDeps,
   input: SubmitReviewInput,
 ): Promise<SubmitReviewOutput> {
-  const { userCardRepo, reviewRepo, sessionRepo, streakRepo, userXpRepo, achievementRepo } = deps;
+  const {
+    userCardRepo,
+    reviewRepo,
+    sessionRepo,
+    streakRepo,
+    userXpRepo,
+    achievementRepo,
+    runInTransaction,
+  } = deps;
   const userId = input.userId ?? STUB_USER_ID;
   const now = input.now ?? new Date();
   const wasNew = input.userCard.stage === 'New';
 
-  // 1. Calculate next SRS state (pure)
+  // 1. Calculate next SRS state — pure computation, outside the transaction
   const { userCard: updatedUserCard } = calculateNextReview({
     userCard: input.userCard,
     rating: input.rating,
     now,
   });
 
-  // 2. Persist updated UserCard
-  await userCardRepo.upsert(updatedUserCard);
-
-  // 3. Persist Review record
-  await reviewRepo.create({
-    userCardId: input.userCard.id as UserCardId,
-    sessionId: input.sessionId,
-    rating: input.rating,
-    durationMs: input.durationMs,
-    exerciseType: 'flashcard',
-    reviewedAt: now.toISOString(),
-  });
-
-  // 4. Update streak
+  // Pre-compute streak fields (reads streak before transaction; Dexie 'rw'
+  // transactions allow reads of participating tables, but we compute outside
+  // to keep the transaction body pure-write only for maximum throughput).
   const existingStreak = await streakRepo.findByUser(userId);
   const prevStreak = existingStreak ?? {
     userId,
@@ -95,36 +109,23 @@ export async function submitReview(
   };
 
   const today = toIsoDate(now);
-  const alreadyCountedToday = prevStreak.lastActiveDate === today;
-  const streakUpdated = !alreadyCountedToday;
-
-  // Update heatmap (+1 for today's review)
+  const streakUpdated = prevStreak.lastActiveDate !== today;
   const heatmapData = { ...prevStreak.heatmapData };
   heatmapData[today] = (heatmapData[today] ?? 0) + 1;
-
   const newStreakObj = updateStreak({ ...prevStreak, heatmapData }, now);
-  await streakRepo.upsert(newStreakObj);
 
-  // 5. Compute XP (simple: no daily-goal check in prototype)
   const xpEarned = computeXp({ rating: input.rating, isNewCard: wasNew });
-
   const existingXp = await userXpRepo.findByUser(userId);
   const prevTotalXp = existingXp?.totalXp ?? 0;
   const newTotalXp = prevTotalXp + xpEarned;
   const newLevel = levelFromTotalXp(newTotalXp);
   const newXpToNext = xpToNextLevel(newTotalXp);
 
-  await userXpRepo.upsert({ userId, totalXp: newTotalXp, level: newLevel, xpToNext: newXpToNext });
-
-  // 6. Check achievements
   const existingAchievements = await achievementRepo.listByUser(userId);
   const earnedCodes = existingAchievements.map((a) => a.badgeCode);
-
-  // Count total reviews (reviews in this session + prior — approximate with sessionReviewCount+1)
   const totalReviews = input.sessionReviewCount + 1;
   const sessionAccuracy =
     totalReviews > 0 ? (input.sessionCorrectCount + (input.rating >= 3 ? 1 : 0)) / totalReviews : 0;
-
   const newlyEarned = checkAchievements({
     earnedBadgeCodes: earnedCodes,
     totalReviews,
@@ -137,21 +138,50 @@ export async function submitReview(
     deckCount: 1,
   });
 
-  // Persist each new achievement
-  const newAchievements: string[] = [];
-  for (const code of newlyEarned) {
-    await achievementRepo.award(userId, code);
-    newAchievements.push(code);
-  }
-
-  // 7. Update session stats
   const session = await sessionRepo.findById(input.sessionId);
-  if (session) {
-    await sessionRepo.update(input.sessionId, {
-      cardsReviewed: session.cardsReviewed + 1,
-      newCards: wasNew ? session.newCards + 1 : session.newCards,
+
+  // 2–7. All writes in a single atomic transaction.
+  //      If any write throws, Dexie rolls back the entire transaction.
+  const newAchievements: string[] = [];
+  await runInTransaction(async () => {
+    // 2. Persist updated UserCard
+    await userCardRepo.upsert(updatedUserCard);
+
+    // 3. Persist Review record
+    await reviewRepo.create({
+      userCardId: input.userCard.id as UserCardId,
+      sessionId: input.sessionId,
+      rating: input.rating,
+      durationMs: input.durationMs,
+      exerciseType: 'flashcard',
+      reviewedAt: now.toISOString(),
     });
-  }
+
+    // 4. Upsert streak
+    await streakRepo.upsert(newStreakObj);
+
+    // 5. Upsert XP
+    await userXpRepo.upsert({
+      userId,
+      totalXp: newTotalXp,
+      level: newLevel,
+      xpToNext: newXpToNext,
+    });
+
+    // 6. Persist each new achievement
+    for (const code of newlyEarned) {
+      await achievementRepo.award(userId, code);
+      newAchievements.push(code);
+    }
+
+    // 7. Update session stats
+    if (session) {
+      await sessionRepo.update(input.sessionId, {
+        cardsReviewed: session.cardsReviewed + 1,
+        newCards: wasNew ? session.newCards + 1 : session.newCards,
+      });
+    }
+  });
 
   return {
     updatedUserCard,
