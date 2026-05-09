@@ -37,11 +37,19 @@ const withSerwist = withSerwistInit({
  * next/font for inline style injection. Nonce-based CSP is deferred to a future
  * iteration when the backend is in place (CSP nonce generation requires server context).
  *
+ * 'unsafe-eval' is added to script-src in development only — React/Turbopack uses
+ * eval() in dev for source-map reconstruction and HMR. Production builds never use eval.
+ *
  * worker-src blob: is required for Serwist service worker registration.
  */
+const isDev = process.env.NODE_ENV === 'development';
+const scriptSrc = isDev
+  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+  : "script-src 'self' 'unsafe-inline'";
+
 const cspHeader = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  scriptSrc,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://fonts.gstatic.com",
   "font-src 'self' data: https://fonts.gstatic.com",
