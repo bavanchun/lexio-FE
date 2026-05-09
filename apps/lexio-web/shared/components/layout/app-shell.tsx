@@ -15,16 +15,20 @@ interface AppShellProps {
   displayName: string;
   /** Called when user clicks "Sign out" in the avatar dropdown. */
   onSignOut: () => void;
+  /** Current day streak — passed from (app)/layout.tsx. */
+  streak?: number;
+  /** Current XP level — passed from (app)/layout.tsx. */
+  level?: number;
 }
 
-export function AppShell({ children, displayName, onSignOut }: AppShellProps) {
+export function AppShell({ children, displayName, onSignOut, streak, level }: AppShellProps) {
   return (
     <div className="flex h-full min-h-screen flex-col">
       <NotProdBanner />
       <div className="flex flex-1 overflow-hidden">
         <SidebarNav />
         <div className="flex flex-1 flex-col overflow-hidden">
-          <TopBar displayName={displayName} onSignOut={onSignOut} />
+          <TopBar displayName={displayName} onSignOut={onSignOut} streak={streak} level={level} />
           <main className="flex-1 overflow-y-auto p-6">{children}</main>
         </div>
       </div>
