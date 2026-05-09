@@ -9,6 +9,11 @@
  *
  * dropdownExtras: passed through to TopBar so the app/ layer can inject
  * features-layer items (e.g. NotificationToggle) without a boundary violation.
+ *
+ * NOTE: NotProdBanner is rendered as the FIRST child of this shell so it appears
+ * on every authenticated route (/dashboard, /study, /decks, /stats).
+ * The (auth)/layout.tsx also renders NotProdBanner for the login page directly
+ * (that layout does not use AppShell).
  */
 import { NotProdBanner } from '@/shared/components/not-prod-banner';
 import { OfflineIndicator } from '@/shared/components/offline-indicator';
