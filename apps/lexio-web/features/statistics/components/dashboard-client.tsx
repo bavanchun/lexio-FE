@@ -33,7 +33,6 @@ import { AchievementsGrid } from './achievements-grid';
 
 const HeatmapSkeleton = () => <Skeleton className="h-36 w-full rounded-md" />;
 
-// eslint-disable-next-line boundaries/dependencies
 const Heatmap = dynamic(
   // eslint-disable-next-line boundaries/dependencies
   () => import('./heatmap').then((m) => ({ default: m.Heatmap })),
@@ -43,6 +42,10 @@ const Heatmap = dynamic(
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+/** Stub deck ID — matches STUB_DECK_ID in lib/storage/seed-loader.ts.
+ *  features/ cannot import lib/ directly per boundary rules. */
+const STUB_DECK_ID = 'seed-deck-it-tech-001';
 
 function toIso(date: Date): string {
   return date.toISOString().slice(0, 10);
@@ -98,6 +101,7 @@ export function DashboardClient({ userId, displayName }: DashboardClientProps) {
               dueCount={stats.data.todayDueCount}
               newCount={stats.data.todayNewCount}
               estimatedMinutes={stats.data.estimatedMinutes}
+              deckId={STUB_DECK_ID}
             />
             <StreakCard current={stats.data.streak.current} longest={stats.data.streak.longest} />
             <XpCard
