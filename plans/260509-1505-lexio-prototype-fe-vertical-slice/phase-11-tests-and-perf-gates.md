@@ -10,7 +10,7 @@
 ## Overview
 
 - **Priority:** P1
-- **Status:** pending
+- **Status:** complete
 - **Brief:** Lock testing pyramid: unit (Vitest, ≥80% on `core/`), integration (RTL on flashcard rating flow), E2E (Playwright happy path), Lighthouse CI ≥95 on critical routes, bundle analyzer with size budget.
 
 ## Key insights
@@ -122,14 +122,14 @@
 
 ## Todo
 
-- [ ] @next/bundle-analyzer wired
-- [ ] check-bundle-size.mjs gate (200 KB)
-- [ ] web-vitals reporter
-- [ ] Lighthouse CI config
-- [ ] E2E happy-path spec
-- [ ] Integration test for flashcard flow
-- [ ] CI workflow file
-- [ ] Local `pnpm validate` script
+- [x] @next/bundle-analyzer wired
+- [x] check-bundle-size.mjs gate (200 KB)
+- [x] web-vitals reporter
+- [x] Lighthouse CI config
+- [x] E2E happy-path spec
+- [x] Integration test for flashcard flow (pre-existing, verified passing)
+- [x] CI workflow file
+- [x] Local `pnpm validate` script
 
 ## Success criteria
 
