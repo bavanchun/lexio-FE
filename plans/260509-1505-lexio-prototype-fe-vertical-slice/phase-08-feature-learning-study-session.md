@@ -10,7 +10,7 @@
 ## Overview
 
 - **Priority:** P1 (HERO)
-- **Status:** pending
+- **Status:** complete
 - **Brief:** End-to-end study flow. `/study/[sessionId]` renders a flashcard, user flips, rates Again/Hard/Good/Easy, SRS use case computes next state, repos persist, next card or summary. Keyboard shortcuts. Session state in Zustand.
 
 ## Key insights
@@ -124,16 +124,16 @@ Note: `features/learning/use-cases/` is fine — these are FE orchestrators that
 
 ## Todo
 
-- [ ] start-session orchestrator
-- [ ] submit-review orchestrator (transactional)
-- [ ] session-store
-- [ ] Flashcard with CSS flip ≤200ms
-- [ ] RatingBar with keybinds
-- [ ] AudioButton w/ Web Speech fallback
-- [ ] SessionSummary
-- [ ] KeyboardShortcuts overlay
-- [ ] Integration test: 5-card flow → summary
-- [ ] Achievement toast on first review
+- [x] start-session orchestrator
+- [x] submit-review orchestrator (transactional)
+- [x] session-store
+- [x] Flashcard with CSS flip ≤200ms
+- [x] RatingBar with keybinds
+- [x] AudioButton w/ Web Speech fallback
+- [x] SessionSummary
+- [x] KeyboardShortcuts overlay
+- [x] Integration test: 5-card flow → summary
+- [x] Achievement toast on first review
 
 ## Success criteria
 
