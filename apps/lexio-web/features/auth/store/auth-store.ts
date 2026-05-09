@@ -11,6 +11,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { STUB_USER_ID } from '@/lib/storage/seed-loader';
 
 export interface StubUser {
   id: string;
@@ -36,15 +37,6 @@ interface AuthState {
   setHydrated: () => void;
 }
 
-/** Deterministic uuid-v4 from crypto.randomUUID() (available in all modern browsers + Node 18+) */
-function newId(): string {
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-    return crypto.randomUUID();
-  }
-  // Fallback for environments where crypto.randomUUID is unavailable
-  return Math.random().toString(36).slice(2) + Date.now().toString(36);
-}
-
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
@@ -53,8 +45,11 @@ export const useAuthStore = create<AuthState>()(
 
       signIn: async (email: string, displayName: string) => {
         const now = new Date().toISOString();
+        // Use the same deterministic id as the seed loader so a freshly signed-in
+        // user immediately sees the seeded "IT/Tech Essentials" deck. The prototype
+        // is single-user by design; .NET 10 Identity service replaces this entirely.
         const user: StubUser = {
-          id: newId(),
+          id: STUB_USER_ID,
           email: email.trim().toLowerCase(),
           displayName: displayName.trim() || email.split('@')[0] || email,
           role: 'Learner',

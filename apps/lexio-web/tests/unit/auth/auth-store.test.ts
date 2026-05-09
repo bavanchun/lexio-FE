@@ -28,17 +28,17 @@ describe('useAuthStore — signIn', () => {
     expect(useAuthStore.getState().user?.email).toBe('test@example.com');
   });
 
-  it('generates a non-empty id on each signIn', async () => {
+  it('uses the deterministic STUB_USER_ID so seeded data is visible', async () => {
     await useAuthStore.getState().signIn('a@b.com', 'A');
     const id1 = useAuthStore.getState().user?.id;
     useAuthStore.setState({ user: null });
     await useAuthStore.getState().signIn('a@b.com', 'A');
     const id2 = useAuthStore.getState().user?.id;
 
-    expect(id1).toBeTruthy();
-    expect(id2).toBeTruthy();
-    // IDs should differ between separate signIn calls
-    expect(id1).not.toBe(id2);
+    // Single-user prototype: every signin reuses the same id as the seed loader
+    // so the seeded "IT/Tech Essentials" deck is owned by the logged-in user.
+    expect(id1).toBe('stub-user-000');
+    expect(id2).toBe('stub-user-000');
   });
 
   it('sets createdAt and lastLoginAt as ISO strings', async () => {
