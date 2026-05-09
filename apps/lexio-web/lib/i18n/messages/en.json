@@ -37,12 +37,89 @@
   "dashboard": {
     "title": "Dashboard",
     "comingSoon": "Full dashboard coming in phase 09.",
-    "greeting": "Welcome back",
-    "streakLabel": "Day streak",
-    "xpLabel": "Total XP",
-    "levelLabel": "Level",
-    "reviewsDueLabel": "Reviews due",
-    "recentActivity": "Recent activity"
+    "greeting": {
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening"
+    },
+    "streak": {
+      "current": "Day streak",
+      "best": "Best",
+      "days": "days"
+    },
+    "xp": {
+      "level": "Level",
+      "toNext": "xp to level",
+      "xp": "XP"
+    },
+    "today": {
+      "due": "Due for review",
+      "new": "New cards",
+      "minutes": "Estimated time",
+      "startStudying": "Start studying"
+    },
+    "activity": "Activity",
+    "achievements": "Achievements",
+    "viewAll": "View all"
+  },
+  "stats": {
+    "title": "Statistics",
+    "heatmap": {
+      "legend": {
+        "less": "Less",
+        "more": "More"
+      },
+      "modal": {
+        "cardsReviewed": "Cards reviewed",
+        "accuracy": "Accuracy",
+        "timeSpent": "Time spent",
+        "viewSession": "View session"
+      }
+    }
+  },
+  "achievements": {
+    "locked": "Locked",
+    "earnedOn": "Earned on",
+    "firstSteps": {
+      "name": "First steps",
+      "trigger": "Complete your first review"
+    },
+    "weekWarrior": {
+      "name": "Week warrior",
+      "trigger": "Maintain a 7-day streak"
+    },
+    "monthMaster": {
+      "name": "Month master",
+      "trigger": "Maintain a 30-day streak"
+    },
+    "centuryClub": {
+      "name": "Century club",
+      "trigger": "Master 100 cards"
+    },
+    "kiloCrusher": {
+      "name": "Kilo crusher",
+      "trigger": "Master 1,000 cards"
+    },
+    "polyglotPath": {
+      "name": "Polyglot path",
+      "trigger": "Create 5 decks"
+    },
+    "sharingIsCaring": {
+      "name": "Sharing is caring",
+      "trigger": "Share your first public deck"
+    },
+    "speedDemon": {
+      "name": "Speed demon",
+      "trigger": "Complete 100 reviews in one session"
+    },
+    "perfectDay": {
+      "name": "Perfect day",
+      "trigger": "100% accuracy in a session of 10+ cards"
+    },
+    "comebackKid": {
+      "name": "Comeback kid",
+      "trigger": "Restore a streak after a break"
+    }
   },
   "common": {
     "save": "Save",

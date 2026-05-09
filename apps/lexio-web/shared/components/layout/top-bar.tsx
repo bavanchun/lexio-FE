@@ -23,6 +23,10 @@ import Link from 'next/link';
 interface TopBarProps {
   displayName: string;
   onSignOut: () => void;
+  /** Current day streak — injected from (app)/layout.tsx via features/statistics. Defaults to 0. */
+  streak?: number;
+  /** Current XP level — injected from (app)/layout.tsx via features/statistics. Defaults to 1. */
+  level?: number;
 }
 
 /** Derive two-letter initials from a display name. */
@@ -35,28 +39,28 @@ function getInitials(displayName: string): string {
     .join('');
 }
 
-export function TopBar({ displayName, onSignOut }: TopBarProps) {
+export function TopBar({ displayName, onSignOut, streak = 0, level = 1 }: TopBarProps) {
   const t = useTranslations();
   const initials = getInitials(displayName);
 
   return (
     <header className="flex h-14 items-center justify-end gap-3 border-b border-border bg-card px-4">
-      {/* Streak counter — phase-06 placeholder value */}
+      {/* Streak counter — real value injected from (app)/layout.tsx via features/statistics */}
       <div
         className="flex items-center gap-1 text-sm text-emerald-600 dark:text-emerald-400"
         title={t('shell.streak')}
       >
         <StreakIcon className="h-4 w-4" strokeWidth={1.5} />
-        <span className="font-medium tabular-nums">0</span>
+        <span className="font-medium tabular-nums">{streak}</span>
       </div>
 
-      {/* XP / level indicator — phase-06 placeholder value */}
+      {/* XP / level indicator — real value injected from (app)/layout.tsx */}
       <div
         className="flex items-center gap-1 text-sm text-violet-600 dark:text-violet-400"
-        title={`${t('shell.level')} 1 · 0 ${t('shell.xp')}`}
+        title={`${t('shell.level')} ${level}`}
       >
         <XpIcon className="h-4 w-4" strokeWidth={1.5} />
-        <span className="font-medium tabular-nums">Lv 1</span>
+        <span className="font-medium tabular-nums">Lv {level}</span>
       </div>
 
       <ThemeToggle />

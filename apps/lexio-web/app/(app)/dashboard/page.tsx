@@ -1,24 +1,24 @@
+'use client';
+
 /**
- * /dashboard — placeholder until phase-09 fills this with real data.
+ * /dashboard — statistics dashboard page (phase-09).
+ * Client component: reads auth store for userId + displayName,
+ * then delegates to DashboardClient (TanStack Query + lazy heatmap).
+ *
+ * app/ → features/ is allowed per ESLint boundaries rules.
  */
-import { getTranslations } from 'next-intl/server';
-import Link from 'next/link';
+import { useAuthStore } from '@/features/auth';
+import { DashboardClient } from '@/features/statistics';
 
-export const metadata = { title: 'Dashboard — Lexio' };
+/** Stub user ID — matches seed-loader.ts STUB_USER_ID. app/ cannot import lib/ directly. */
+const FALLBACK_USER_ID = 'stub-user-000';
 
-export default async function DashboardPage() {
-  const t = await getTranslations('dashboard');
+export default function DashboardPage() {
+  const user = useAuthStore((s) => s.user);
+  // Fall back to stub user ID when auth store hasn't hydrated yet —
+  // DashboardClient disables queries when userId is empty, so no false fetch.
+  const userId = user?.id ?? FALLBACK_USER_ID;
+  const displayName = user?.displayName ?? '';
 
-  return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">{t('title')}</h1>
-      <p className="text-muted-foreground">{t('comingSoon')}</p>
-      <Link
-        href="/study/new"
-        className="w-fit rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-      >
-        Start studying
-      </Link>
-    </div>
-  );
+  return <DashboardClient userId={userId} displayName={displayName} />;
 }
