@@ -16,13 +16,14 @@ import { queryKeys } from '@/lib/api/query-keys';
 import type { Rating, SessionId } from '@/core/entities/review';
 // eslint-disable-next-line boundaries/dependencies
 import type { SessionSummary } from '../types';
-// eslint-disable-next-line boundaries/dependencies
+/* eslint-disable boundaries/dependencies */
 import {
   useSessionStore,
   selectCurrentItem,
   selectIsComplete,
   selectCardDurationMs,
 } from '../store/session-store';
+/* eslint-enable boundaries/dependencies */
 // eslint-disable-next-line boundaries/dependencies
 import { startSession } from '../use-cases/start-session';
 // eslint-disable-next-line boundaries/dependencies
