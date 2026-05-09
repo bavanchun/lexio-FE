@@ -10,7 +10,7 @@
 ## Overview
 
 - **Priority:** P2
-- **Status:** pending
+- **Status:** complete (Lighthouse manual verification pending)
 - **Brief:** Wire Serwist for service worker + offline. App manifest with §12 brand colors. Web push subscription stub (no real delivery). Offline route. CSP headers.
 
 ## Key insights
@@ -133,14 +133,14 @@
 
 ## Todo
 
-- [ ] Serwist wired in next.config
-- [ ] sw.ts with offline fallback
-- [ ] manifest.ts with §12 colors
-- [ ] /offline route
-- [ ] Push subscribe stub + Dexie persist
-- [ ] CSP headers
-- [ ] Icons 192/512/maskable
-- [ ] Lighthouse PWA passes
+- [x] Serwist wired in next.config
+- [x] sw.ts with offline fallback
+- [x] manifest.ts with §12 colors
+- [x] /offline route
+- [x] Push subscribe stub + Dexie persist (stub — no backend, returns subscription locally)
+- [x] CSP headers
+- [x] Icons 192/512/maskable (192, 512, apple-touch-icon via ImageMagick)
+- [ ] Lighthouse PWA passes (manual verification — requires production build + DevTools)
 
 ## Success criteria
 
