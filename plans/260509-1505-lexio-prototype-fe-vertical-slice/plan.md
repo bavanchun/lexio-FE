@@ -1,7 +1,7 @@
 ---
 title: 'Lexio Prototype — FE Vertical Slice (SM-2 + Dexie + PWA)'
 description: 'End-to-end FE-only prototype: stub auth → dashboard → flashcard study → SM-2 update → stats. Clean Architecture + ShadCN/Tailwind v4 brand from doc §12.'
-status: pending
+status: complete
 priority: P1
 effort: ~5-7 days
 branch: main
@@ -19,20 +19,20 @@ Stub login → Dashboard (due/new/streak/XP/heatmap) → Start study → Flashca
 
 ## Phases & dependency graph
 
-| #   | Phase                                      | Status  | Depends on |
-| --- | ------------------------------------------ | ------- | ---------- |
-| 01  | Monorepo & tooling                         | pending | —          |
-| 02  | Design system & theme (USER APPROVAL GATE) | pending | 01         |
-| 03  | Clean architecture skeleton                | pending | 01         |
-| 04  | SRS engine (pure TS + tests)               | pending | 03         |
-| 05  | Dexie persistence + mock API + seed        | pending | 03         |
-| 06  | Auth stub + app shell                      | pending | 02, 03     |
-| 07  | Vocabulary feature (read-only decks/cards) | pending | 05, 06     |
-| 08  | Learning feature (study session — HERO)    | pending | 04, 05, 06 |
-| 09  | Statistics feature (dashboard, heatmap)    | pending | 05, 08     |
-| 10  | PWA & offline                              | pending | 02, 06     |
-| 11  | Tests & perf gates                         | pending | 04-09      |
-| 12  | Docs & handoff                             | pending | 11         |
+| #   | Phase                                      | Status   | Depends on |
+| --- | ------------------------------------------ | -------- | ---------- |
+| 01  | Monorepo & tooling                         | complete | —          |
+| 02  | Design system & theme (USER APPROVAL GATE) | complete | 01         |
+| 03  | Clean architecture skeleton                | complete | 01         |
+| 04  | SRS engine (pure TS + tests)               | complete | 03         |
+| 05  | Dexie persistence + mock API + seed        | complete | 03         |
+| 06  | Auth stub + app shell                      | complete | 02, 03     |
+| 07  | Vocabulary feature (read-only decks/cards) | complete | 05, 06     |
+| 08  | Learning feature (study session — HERO)    | complete | 04, 05, 06 |
+| 09  | Statistics feature (dashboard, heatmap)    | complete | 05, 08     |
+| 10  | PWA & offline                              | complete | 02, 06     |
+| 11  | Tests & perf gates                         | complete | 04-09      |
+| 12  | Docs & handoff                             | complete | 11         |
 
 ```
 01 ──┬─► 02 ──┐
