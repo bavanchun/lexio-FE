@@ -32,7 +32,9 @@ export function TodayCard({ dueCount, newCount, estimatedMinutes, deckId }: Toda
               <Clock className="h-4 w-4" strokeWidth={1.5} />
               <span>Due for review</span>
             </div>
-            <span className="text-sm font-medium tabular-nums">{dueCount}</span>
+            <span className="text-sm font-medium tabular-nums" data-testid="today-due-count">
+              {dueCount}
+            </span>
           </div>
 
           <div className="flex items-center justify-between">

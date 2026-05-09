@@ -76,7 +76,7 @@ test.describe('Happy path — login to study to streak', () => {
     await waitForDbReady(page);
 
     // Seed loads 30 cards all due — verify due count is visible.
-    await expect(page.getByText('30')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByTestId('today-due-count')).toHaveText('30', { timeout: 10_000 });
 
     // Click "Start studying" CTA in TodayCard.
     await page.getByRole('button', { name: /start studying/i }).click();
