@@ -9,7 +9,7 @@
  */
 import { useState, useCallback } from 'react';
 import { useTheme } from 'next-themes';
-// eslint-disable-next-line boundaries/dependencies
+
 import { heatmapColor, heatmapIntensity } from '../lib/heatmap-color-scale';
 // eslint-disable-next-line boundaries/dependencies
 import { HeatmapDayModal } from './heatmap-day-modal';

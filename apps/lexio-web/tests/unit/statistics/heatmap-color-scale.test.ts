@@ -9,7 +9,6 @@ import {
   heatmapIntensity,
 } from '@/features/statistics/lib/heatmap-color-scale';
 
-// eslint-disable-next-line boundaries/dependencies
 describe('getIntensityBucket', () => {
   it('returns 0 for count=0', () => {
     expect(getIntensityBucket(0)).toBe(0);
