@@ -1,24 +1,21 @@
 'use client';
 
 /**
- * /study/[sessionId] — study session page.
- * Reads deckId from searchParams (passed by /decks/[id] "Start studying" CTA).
- * Falls back to redirect to /decks if deckId is missing.
+ * /study/new — reads deckId from searchParams, immediately renders the
+ * StudySession component (which calls startSession on mount and loads queue).
+ * Keeping this client-side avoids a round-trip redirect and lets the Zustand
+ * store load naturally.
  */
-import { use, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { StudySession } from '@/features/learning/components/study-session';
 
-interface StudySessionPageProps {
-  params: Promise<{ sessionId: string }>;
-}
-
-export default function StudySessionPage({ params }: StudySessionPageProps) {
-  const { sessionId } = use(params);
+export default function StudyNewPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const deckId = searchParams.get('deckId');
 
+  // Guard: if no deckId, redirect to decks list
   useEffect(() => {
     if (!deckId) {
       router.replace('/decks');
@@ -29,7 +26,7 @@ export default function StudySessionPage({ params }: StudySessionPageProps) {
 
   return (
     <div className="mx-auto w-full max-w-xl">
-      <StudySession key={sessionId} deckId={deckId} />
+      <StudySession deckId={deckId} />
     </div>
   );
 }
