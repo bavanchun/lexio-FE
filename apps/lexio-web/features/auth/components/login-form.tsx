@@ -43,8 +43,6 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
-      <p className="text-sm text-muted-foreground">{t('signInDescription')}</p>
-
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="email">{t('email')}</Label>
         <Input
