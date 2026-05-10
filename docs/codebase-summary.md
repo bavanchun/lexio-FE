@@ -1,6 +1,6 @@
 # Codebase summary — Lexio FE prototype
 
-> Snapshot of the prototype state post-phase-12. Source of truth: `docs/Lexio_Complete_Documentation.docx`.
+> Snapshot of the prototype state post-phase-12. Source of truth: `../docs/Lexio_Complete_Documentation.docx` (parent monorepo umbrella).
 
 ## What's implemented (phases 01–12)
 
