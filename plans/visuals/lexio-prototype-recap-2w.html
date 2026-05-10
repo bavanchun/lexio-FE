@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lexio — v0.1.0 prototype recap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  /* ======================================================
+     Lexio §12 brand tokens — Zinc + Indigo
+     Light is default. Dark via OS preference OR manual toggle.
+     ====================================================== */
+  :root {
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+
+    --bg: #FFFFFF;
+    --fg: #09090B;
+    --card: #FFFFFF;
+    --surface: #FFFFFF;
+    --surface2: #FAFAFA;
+    --muted: #F4F4F5;
+    --muted-fg: #71717A;
+    --border: #E4E4E7;
+    --border-bright: #D4D4D8;
+
+    --primary: #4F46E5;
+    --primary-dim: rgba(79, 70, 229, 0.08);
+    --ring: #4F46E5;
+
+    --success: #10B981;
+    --success-dim: rgba(16, 185, 129, 0.10);
+    --warning: #F59E0B;
+    --warning-dim: rgba(245, 158, 11, 0.10);
+    --danger: #EF4444;
+    --danger-dim: rgba(239, 68, 68, 0.10);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #09090B;
+      --fg: #FAFAFA;
+      --card: #18181B;
+      --surface: #18181B;
+      --surface2: #1F1F22;
+      --muted: #27272A;
+      --muted-fg: #A1A1AA;
+      --border: #27272A;
+      --border-bright: #3F3F46;
+
+      --primary: #818CF8;
+      --primary-dim: rgba(129, 140, 248, 0.12);
+      --ring: #818CF8;
+
+      --success: #34D399;
+      --success-dim: rgba(52, 211, 153, 0.12);
+      --warning: #FBBF24;
+      --warning-dim: rgba(251, 191, 36, 0.12);
+      --danger: #F87171;
+      --danger-dim: rgba(248, 113, 113, 0.12);
+    }
+  }
+
+  [data-theme="dark"] {
+    --bg: #09090B;
+    --fg: #FAFAFA;
+    --card: #18181B;
+    --surface: #18181B;
+    --surface2: #1F1F22;
+    --muted: #27272A;
+    --muted-fg: #A1A1AA;
+    --border: #27272A;
+    --border-bright: #3F3F46;
+
+    --primary: #818CF8;
+    --primary-dim: rgba(129, 140, 248, 0.12);
+    --ring: #818CF8;
+
+    --success: #34D399;
+    --success-dim: rgba(52, 211, 153, 0.12);
+    --warning: #FBBF24;
+    --warning-dim: rgba(251, 191, 36, 0.12);
+    --danger: #F87171;
+    --danger-dim: rgba(248, 113, 113, 0.12);
+  }
+
+  /* ======================================================
+     Reset + base
+     ====================================================== */
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-wrap: break-word;
+  }
+  body { font-variant-numeric: tabular-nums; }
+
+  a { color: var(--primary); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  code, kbd, samp { font-family: var(--font-mono); font-size: 0.9em; }
+
+  ::selection { background: var(--primary-dim); color: var(--fg); }
+
+  /* ======================================================
+     Theme toggle
+     ====================================================== */
+  .theme-toggle {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 300;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--muted-fg);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .theme-toggle:hover { background: var(--muted); color: var(--fg); border-color: var(--border-bright); }
+  .theme-toggle svg { width: 18px; height: 18px; }
+
+  /* ======================================================
+     Top nav
+     ====================================================== */
+  .topnav {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: saturate(140%) blur(8px);
+    -webkit-backdrop-filter: saturate(140%) blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topnav__inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .topnav__brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: -0.01em;
+  }
+  .topnav__mark {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    background: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .topnav__links {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .topnav__links a {
+    color: var(--muted-fg);
+    font-size: 13px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.12s, color 0.12s;
+  }
+  .topnav__links a:hover { background: var(--muted); color: var(--fg); }
+  .topnav__select {
+    display: none;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: 13px;
+    max-width: 180px;
+  }
+
+  @media (max-width: 820px) {
+    .topnav__links { display: none; }
+    .topnav__select { display: inline-block; }
+  }
+
+  /* ======================================================
+     Container + sections
+     ====================================================== */
+  .container {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 56px 24px;
+  }
+  section { scroll-margin-top: 80px; }
+  section + section { margin-top: 72px; }
+
+  .section-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.6px;
+    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .section-eyebrow::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .section-title {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 0 0 8px;
+    line-height: 1.2;
+  }
+  .section-lede {
+    color: var(--muted-fg);
+    margin: 0 0 28px;
+    max-width: 64ch;
+    font-size: 15px;
+  }
+
+  /* ======================================================
+     Hero
+     ====================================================== */
+  .hero {
+    padding: 24px 0 8px;
+  }
+  .hero__row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .hero__title {
+    font-size: clamp(40px, 5.5vw, 64px);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    margin: 0 0 12px;
+    line-height: 1.05;
+  }
+  .hero__tagline {
+    font-size: 19px;
+    color: var(--muted-fg);
+    margin: 0 0 28px;
+    max-width: 60ch;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid transparent;
+  }
+  .badge--success { color: var(--success); background: var(--success-dim); border-color: color-mix(in srgb, var(--success) 30%, transparent); }
+  .badge--muted { color: var(--muted-fg); background: var(--muted); border-color: var(--border); }
+  .badge--primary { color: var(--primary); background: var(--primary-dim); border-color: color-mix(in srgb, var(--primary) 30%, transparent); }
+  .badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .hero__meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 8px;
+  }
+  .hero__meta-item {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    background: var(--card);
+  }
+  .hero__meta-label {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--muted-fg);
+    margin-bottom: 6px;
+  }
+  .hero__meta-value {
+    font-size: 14px;
+    color: var(--fg);
+    word-break: break-word;
+  }
+  .hero__meta-value code {
+    background: var(--muted);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  .hero__summary {
+    margin-top: 32px;
+    padding: 20px 22px;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--primary);
+    border-radius: 10px;
+    background: var(--card);
+    color: var(--fg);
+    font-size: 16px;
+    line-height: 1.65;
+    max-width: 80ch;
+  }
+
+  /* ======================================================
+     Generic card
+     ====================================================== */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+  }
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  /* ======================================================
+     Architecture table
+     ====================================================== */
+  .arch-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 14px;
+  }
+  .arch-table th, .arch-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .arch-table thead th {
+    background: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--muted-fg);
+    font-weight: 600;
+  }
+  .arch-table tbody tr:last-child td { border-bottom: none; }
+  .arch-table code {
+    background: var(--muted);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--fg);
+  }
+
+  /* ======================================================
+     Mermaid wrap (matches §12 with subtle border)
+     ====================================================== */
+  .mermaid-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 24px;
+    overflow: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 320px;
+  }
+  .mermaid-wrap svg { max-width: 100%; height: auto !important; }
+
+  /* ======================================================
+     KPI cards
+     ====================================================== */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+  }
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    transition: border-color 0.15s;
+  }
+  .kpi-card:hover { border-color: var(--border-bright); }
+  .kpi-card__label {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--muted-fg);
+    margin-bottom: 8px;
+  }
+  .kpi-card__value {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi-card__sub {
+    font-size: 12.5px;
+    color: var(--muted-fg);
+    margin-top: 6px;
+  }
+
+  /* ======================================================
+     Bar chart (commit type distribution)
+     ====================================================== */
+  .barchart {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .bar {
+    display: grid;
+    grid-template-columns: 80px 1fr 56px;
+    align-items: center;
+    gap: 14px;
+    font-size: 13px;
+  }
+  .bar__label {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--muted-fg);
+    text-transform: lowercase;
+  }
+  .bar__track {
+    height: 10px;
+    background: var(--muted);
+    border-radius: 999px;
+    overflow: hidden;
+    position: relative;
+  }
+  .bar__fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--primary) 70%, var(--muted)), var(--primary));
+  }
+  .bar__count {
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--fg);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ======================================================
+     Vertical timeline
+     ====================================================== */
+  .timeline {
+    position: relative;
+    padding-left: 28px;
+    margin-top: 24px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 6px;
+    bottom: 6px;
+    width: 1px;
+    background: var(--border-bright);
+  }
+  .timeline__item {
+    position: relative;
+    padding: 0 0 22px;
+  }
+  .timeline__item:last-child { padding-bottom: 0; }
+  .timeline__item::before {
+    content: '';
+    position: absolute;
+    left: -28px;
+    top: 5px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--card);
+    border: 2px solid var(--primary);
+  }
+  .timeline__item--hero::before {
+    background: var(--primary);
+    box-shadow: 0 0 0 4px var(--primary-dim);
+  }
+  .timeline__head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .timeline__pr {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--primary);
+    background: var(--primary-dim);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .timeline__branch {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted-fg);
+  }
+  .timeline__desc {
+    margin: 6px 0 0;
+    font-size: 14.5px;
+    color: var(--fg);
+    line-height: 1.55;
+  }
+  .timeline__hero-tag {
+    display: inline-block;
+    margin-left: 6px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--primary);
+  }
+
+  /* ======================================================
+     Decision cards
+     ====================================================== */
+  .decision-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 16px;
+  }
+  .decision {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+  }
+  .decision__num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted-fg);
+    letter-spacing: 1.4px;
+    margin-bottom: 8px;
+  }
+  .decision__title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 10px;
+    color: var(--fg);
+    letter-spacing: -0.01em;
+  }
+  .decision__why, .decision__tradeoff {
+    font-size: 14px;
+    line-height: 1.55;
+    margin: 8px 0 0;
+  }
+  .decision__row-label {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 1.3px;
+    color: var(--muted-fg);
+    margin-right: 6px;
+  }
+
+  /* ======================================================
+     Health row
+     ====================================================== */
+  .health-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 12px;
+  }
+  .health {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .health__top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .health__dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .health__dot--ok { background: var(--success); box-shadow: 0 0 0 3px var(--success-dim); }
+  .health__dot--info { background: var(--primary); box-shadow: 0 0 0 3px var(--primary-dim); }
+  .health__dot--zero { background: var(--muted-fg); box-shadow: 0 0 0 3px var(--muted); }
+  .health__label {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 1.3px;
+    color: var(--muted-fg);
+  }
+  .health__value {
+    font-size: 14px;
+    color: var(--fg);
+    font-weight: 500;
+  }
+
+  /* ======================================================
+     Mental model + amber callouts
+     ====================================================== */
+  .callout-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+  }
+  .callout {
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--primary);
+    border-radius: 10px;
+    padding: 16px 18px;
+    background: var(--card);
+    font-size: 14.5px;
+    line-height: 1.6;
+  }
+  .callout--warn {
+    border-left-color: var(--warning);
+    background: color-mix(in srgb, var(--card) 88%, var(--warning-dim));
+  }
+  .callout__title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--fg);
+    margin: 0 0 8px;
+    letter-spacing: -0.005em;
+  }
+  .callout--warn .callout__title { color: var(--warning); }
+  .callout__body {
+    color: var(--muted-fg);
+    margin: 0;
+  }
+  .callout--warn .callout__body { color: var(--fg); }
+  .callout code {
+    background: var(--muted);
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  /* ======================================================
+     Numbered next steps
+     ====================================================== */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    counter-reset: step;
+  }
+  .step {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 16px;
+    align-items: start;
+    padding: 16px 18px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .step__num {
+    counter-increment: step;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--primary-dim);
+    color: var(--primary);
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .step__num::before { content: counter(step); }
+  .step__phase {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.3px;
+    color: var(--primary);
+    margin-bottom: 4px;
+  }
+  .step__body {
+    font-size: 14.5px;
+    color: var(--fg);
+    line-height: 1.55;
+  }
+
+  /* ======================================================
+     Footer
+     ====================================================== */
+  .footer {
+    margin-top: 96px;
+    padding: 32px 0 48px;
+    border-top: 1px solid var(--border);
+    color: var(--muted-fg);
+    font-size: 13px;
+  }
+  .footer__grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 20px;
+    align-items: end;
+    flex-wrap: wrap;
+  }
+  .footer__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .footer__list code {
+    background: var(--muted);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  .footer__tag {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--primary);
+    letter-spacing: 0.5px;
+  }
+
+  @media (max-width: 768px) {
+    .container { padding: 40px 18px; }
+    section + section { margin-top: 56px; }
+    .hero__title { letter-spacing: -0.025em; }
+    .footer__grid { grid-template-columns: 1fr; }
+    .step { grid-template-columns: 32px 1fr; gap: 12px; }
+    .bar { grid-template-columns: 64px 1fr 44px; gap: 10px; }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ======================================================
+     Theme toggle (inline SVG sun/moon)
+     ====================================================== -->
+<button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle light/dark theme" title="Toggle theme">
+  <span id="themeIcon" aria-hidden="true"></span>
+</button>
+
+<!-- ======================================================
+     Top nav
+     ====================================================== -->
+<nav class="topnav" aria-label="Primary">
+  <div class="topnav__inner">
+    <div class="topnav__brand">
+      <span class="topnav__mark">L</span>
+      <span>Lexio</span>
+      <span class="badge badge--muted" style="margin-left:6px">v0.1.0</span>
+    </div>
+    <div class="topnav__links">
+      <a href="#hero">Overview</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#kpis">Metrics</a>
+      <a href="#activity">Activity</a>
+      <a href="#decisions">Decisions</a>
+      <a href="#health">Health</a>
+      <a href="#mental-model">Mental model</a>
+      <a href="#hotspots">Hotspots</a>
+      <a href="#next-steps">Next steps</a>
+    </div>
+    <select class="topnav__select" id="navSelect" aria-label="Jump to section">
+      <option value="#hero">Overview</option>
+      <option value="#architecture">Architecture</option>
+      <option value="#kpis">Metrics</option>
+      <option value="#activity">Activity</option>
+      <option value="#decisions">Decisions</option>
+      <option value="#health">Health</option>
+      <option value="#mental-model">Mental model</option>
+      <option value="#hotspots">Hotspots</option>
+      <option value="#next-steps">Next steps</option>
+    </select>
+  </div>
+</nav>
+
+<main class="container">
+
+  <!-- ===================== 1. Hero ===================== -->
+  <section id="hero" class="hero">
+    <div class="hero__row">
+      <span class="badge badge--success">v0.1.0 prototype shipped</span>
+      <span class="badge badge--muted">2026-05-09 → 2026-05-10</span>
+      <span class="badge badge--primary">Single 2-day session</span>
+    </div>
+    <h1 class="hero__title">Lexio</h1>
+    <p class="hero__tagline">Master vocabulary, the smart way.</p>
+
+    <div class="hero__meta">
+      <div class="hero__meta-item">
+        <div class="hero__meta-label">Type</div>
+        <div class="hero__meta-value">Vocabulary learning platform — IT/Tech English (CEFR A1 → B2)</div>
+      </div>
+      <div class="hero__meta-item">
+        <div class="hero__meta-label">Repository</div>
+        <div class="hero__meta-value"><code>git@github.com:bavanchun/lexio-FE.git</code></div>
+      </div>
+      <div class="hero__meta-item">
+        <div class="hero__meta-label">Build window</div>
+        <div class="hero__meta-value">2026-05-09 → 2026-05-10</div>
+      </div>
+      <div class="hero__meta-item">
+        <div class="hero__meta-label">Status</div>
+        <div class="hero__meta-value">Prototype shipped, tagged on main</div>
+      </div>
+    </div>
+
+    <p class="hero__summary">
+      FE-first vertical slice — Next.js 16 PWA + Dexie + pure-TS SM-2 engine. Backend (.NET 10) deferred to next iteration.
+    </p>
+  </section>
+
+  <!-- ===================== 2. Architecture ===================== -->
+  <section id="architecture">
+    <span class="section-eyebrow">02 — Architecture</span>
+    <h2 class="section-title">Architecture snapshot</h2>
+    <p class="section-lede">Current state — everything runs in the browser. The same pure-TS core is portable to .NET when the backend lands.</p>
+
+    <div class="mermaid-wrap">
+      <pre class="mermaid">
+flowchart TB
+  Browser["Browser PWA<br/>Next.js 16 App Router"]
+  SW["Service Worker<br/>Serwist"]
+  IDB[("IndexedDB<br/>via Dexie")]
+  Core["core/ use-cases<br/>SM-2 pure TS"]
+  Browser -->|cache + offline| SW
+  SW -->|read/write| IDB
+  Browser -->|read/write| IDB
+  Browser -->|calculate schedules| Core
+      </pre>
+    </div>
+
+    <table class="arch-table">
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Path</th>
+          <th>Responsibility</th>
+          <th>Examples</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Pages</td>
+          <td><code>app/(app)/</code></td>
+          <td>Route + RSC shell</td>
+          <td>dashboard, study, decks</td>
+        </tr>
+        <tr>
+          <td>Features</td>
+          <td><code>features/</code></td>
+          <td>Vertical slices</td>
+          <td>learning, vocabulary, statistics</td>
+        </tr>
+        <tr>
+          <td>Core</td>
+          <td><code>core/</code></td>
+          <td>Pure TS domain</td>
+          <td>SM-2, gamification, entities, ports</td>
+        </tr>
+        <tr>
+          <td>Lib</td>
+          <td><code>lib/storage/</code></td>
+          <td>Adapters</td>
+          <td>Dexie repos implementing core ports</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===================== 3. KPI dashboard ===================== -->
+  <section id="kpis">
+    <span class="section-eyebrow">03 — Metrics</span>
+    <h2 class="section-title">KPI dashboard</h2>
+    <p class="section-lede">Six numbers that summarize the build.</p>
+
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-card__label">PRs merged</div>
+        <div class="kpi-card__value">13</div>
+        <div class="kpi-card__sub">10 phases + 1 docs + 2 hotfixes</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__label">Commits on main</div>
+        <div class="kpi-card__value">61</div>
+        <div class="kpi-card__sub">Linear, Conventional Commits</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__label">Files changed</div>
+        <div class="kpi-card__value">401</div>
+        <div class="kpi-card__sub">+36,556 / −3,015</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__label">Tests</div>
+        <div class="kpi-card__value">290</div>
+        <div class="kpi-card__sub">Unit + integration + 1 e2e suite</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__label">SRS coverage</div>
+        <div class="kpi-card__value">100%</div>
+        <div class="kpi-card__sub">Branches, lines, functions</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__label">ESLint boundary violations</div>
+        <div class="kpi-card__value">0</div>
+        <div class="kpi-card__sub">Clean Arch enforced</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 4. Activity ===================== -->
+  <section id="activity">
+    <span class="section-eyebrow">04 — Activity</span>
+    <h2 class="section-title">Recent activity</h2>
+    <p class="section-lede">Commit type distribution and the 12-phase PR timeline that produced v0.1.0.</p>
+
+    <div class="card" style="margin-bottom:24px">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div>
+          <div style="font-family:var(--font-mono);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted-fg)">Commit type distribution</div>
+          <div style="font-size:13px;color:var(--muted-fg);margin-top:4px">60 commits across 7 categories</div>
+        </div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted-fg)">last 2 weeks</div>
+      </div>
+      <div class="barchart">
+        <div class="bar"><span class="bar__label">feat</span><div class="bar__track"><div class="bar__fill" style="width:100%"></div></div><span class="bar__count">30</span></div>
+        <div class="bar"><span class="bar__label">fix</span><div class="bar__track"><div class="bar__fill" style="width:40%"></div></div><span class="bar__count">12</span></div>
+        <div class="bar"><span class="bar__label">test</span><div class="bar__track"><div class="bar__fill" style="width:16.7%"></div></div><span class="bar__count">5</span></div>
+        <div class="bar"><span class="bar__label">ci</span><div class="bar__track"><div class="bar__fill" style="width:13.3%"></div></div><span class="bar__count">4</span></div>
+        <div class="bar"><span class="bar__label">chore</span><div class="bar__track"><div class="bar__fill" style="width:13.3%"></div></div><span class="bar__count">4</span></div>
+        <div class="bar"><span class="bar__label">docs</span><div class="bar__track"><div class="bar__fill" style="width:10%"></div></div><span class="bar__count">3</span></div>
+        <div class="bar"><span class="bar__label">plan</span><div class="bar__track"><div class="bar__fill" style="width:6.7%"></div></div><span class="bar__count">2</span></div>
+      </div>
+    </div>
+
+    <div class="timeline">
+      <div class="timeline__item">
+        <div class="timeline__head"><span class="timeline__pr">PR #1</span><span class="timeline__branch">feat/web-clean-arch-skeleton</span></div>
+        <p class="timeline__desc">Monorepo, design system, Clean Arch boundaries, IPA font.</p>
+      </div>
+      <div class="timeline__item">
+        <div class="timeline__head"><span class="timeline__pr">PR #2</span><span class="timeline__branch">feat/web-srs-engine</span></div>
+        <p class="timeline__desc">SM-2 pure TS, 100% coverage, 143 tests.</p>
+      </div>
+      <div class="timeline__item">
+        <div class="timeline__head"><span class="timeline__pr">PR #3</span><span class="timeline__branch">feat/web-dexie-persistence-and-seed</span></div>
+        <p class="timeline__desc">Dexie schema (doc §7.2), 8 repos, 30-card seed.</p>
+      </div>
+      <div class="timeline__item">
+        <div class="timeline__head"><span class="timeline__pr">PR #4</span><span class="timeline__branch">feat/web-auth-stub-and-shell</span></div>
+        <p class="timeline__desc">Zustand stub auth, NOT-PROD banner, app shell, sidebar nav.</p>
+      </div>
+      <div class="timeline__item">
+        <div class="timeline__head"><span class="timeline__pr">PR #5</span><span class="timeline__branch">feat/web-vocabulary-decks-readonly</span></div>
+        <p class="timeline__desc">Deck list + detail, card preview drawer with §4.2 fields.</p>
+      </div>
+      <div class="timeline__item timeline__item--hero">
+        <div class="timeline__head"><span class="timeline__pr">PR #6</span><span class="timeline__branch">feat/web-study-session-hero</span><span class="timeline__hero-tag">Hero</span></div>
+        <p class="timeline__desc">Flashcard + 4-button rating + keyboard shortcuts. The learning loop.</p>
+      </div>
+      <div class="timeline__item">
+        <div class="timeline__head"><span class="timeline__pr">PR #7</span><span class="timeline__branch">feat/web-statistics-dashboard</span></div>
+        <p class="timeline__desc">Dashboard, monochromatic SVG heatmap, achievements.</p>
+      </div>
+      <div class="timeline__item">
+        <div class="timeline__head"><span class="timeline__pr">PR #8</span><span class="timeline__branch">feat/web-pwa-and-offline</span></div>
+        <p class="timeline__desc">Serwist PWA, offline page, install prompt, push stub.</p>
+      </div>
+      <div class="timeline__item">
+        <div class="timeline__head"><span class="timeline__pr">PR #9</span><span class="timeline__branch">feat/web-tests-and-perf-gates</span></div>
+        <p class="timeline__desc">Playwright E2E, Lighthouse CI, bundle gate.</p>
+      </div>
+      <div class="timeline__item">
+        <div class="timeline__head"><span class="timeline__pr">PR #10</span><span class="timeline__branch">docs/web-handoff-and-roadmap</span></div>
+        <p class="timeline__desc">README, codebase-summary, system-architecture, roadmap.</p>
+      </div>
+      <div class="timeline__item">
+        <div class="timeline__head"><span class="timeline__pr">PR #11</span><span class="timeline__branch">fix/web-prototype-review-followups</span></div>
+        <p class="timeline__desc">Five code-review fixes.</p>
+      </div>
+      <div class="timeline__item">
+        <div class="timeline__head"><span class="timeline__pr">PRs #12, #13</span><span class="timeline__branch">CI hotfixes</span></div>
+        <p class="timeline__desc">pnpm version conflict, vitest timeout — patched during merge.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 5. Decision log ===================== -->
+  <section id="decisions">
+    <span class="section-eyebrow">05 — Decisions</span>
+    <h2 class="section-title">Decision log</h2>
+    <p class="section-lede">Six choices that shaped the prototype, each with its trade-off.</p>
+
+    <div class="decision-grid">
+      <div class="decision">
+        <div class="decision__num">01</div>
+        <h3 class="decision__title">FE-first vertical slice (no backend)</h3>
+        <p class="decision__why"><span class="decision__row-label">Why</span>Validate hero learning loop fastest.</p>
+        <p class="decision__tradeoff"><span class="decision__row-label">Trade-off</span>Stub auth is throwaway when .NET 10 lands.</p>
+      </div>
+      <div class="decision">
+        <div class="decision__num">02</div>
+        <h3 class="decision__title">Pure-TS SM-2 in <code>core/use-cases/srs/</code></h3>
+        <p class="decision__why"><span class="decision__row-label">Why</span>Same engine portable to .NET later, easy 100% test coverage.</p>
+        <p class="decision__tradeoff"><span class="decision__row-label">Trade-off</span>No server validation today.</p>
+      </div>
+      <div class="decision">
+        <div class="decision__num">03</div>
+        <h3 class="decision__title">Dexie + 30-card seed JSON over Free Dictionary API</h3>
+        <p class="decision__why"><span class="decision__row-label">Why</span>KISS, offline-first, no rate limits.</p>
+        <p class="decision__tradeoff"><span class="decision__row-label">Trade-off</span>Limited content for prototype users.</p>
+      </div>
+      <div class="decision">
+        <div class="decision__num">04</div>
+        <h3 class="decision__title">Strict §12 brand identity from day 1</h3>
+        <p class="decision__why"><span class="decision__row-label">Why</span>Zinc + Indigo, no gradients, dark-first. Portfolio-grade aesthetics from commit #1.</p>
+        <p class="decision__tradeoff"><span class="decision__row-label">Trade-off</span>More upfront design work.</p>
+      </div>
+      <div class="decision">
+        <div class="decision__num">05</div>
+        <h3 class="decision__title">Stacked PRs + Conventional Commits</h3>
+        <p class="decision__why"><span class="decision__row-label">Why</span>Reviewable, clean history, mid-session protocol introduction.</p>
+        <p class="decision__tradeoff"><span class="decision__row-label">Trade-off</span>Rebase choreography during merge.</p>
+      </div>
+      <div class="decision">
+        <div class="decision__num">06</div>
+        <h3 class="decision__title"><code>eslint-plugin-boundaries</code> Clean Arch enforcement</h3>
+        <p class="decision__why"><span class="decision__row-label">Why</span>Every PR auto-verifies layer rules.</p>
+        <p class="decision__tradeoff"><span class="decision__row-label">Trade-off</span>Occasional barrel re-export friction.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 6. Health ===================== -->
+  <section id="health">
+    <span class="section-eyebrow">06 — Health</span>
+    <h2 class="section-title">State and health indicators</h2>
+    <p class="section-lede">Where the project stands at handoff.</p>
+
+    <div class="health-row">
+      <div class="health">
+        <div class="health__top"><span class="health__dot health__dot--ok"></span><span class="health__label">CI on main</span></div>
+        <div class="health__value">Green — build, lint, typecheck, 290 tests, Lighthouse</div>
+      </div>
+      <div class="health">
+        <div class="health__top"><span class="health__dot health__dot--ok"></span><span class="health__label">Lighthouse</span></div>
+        <div class="health__value">A11y / BP / SEO / Perf ≥ 0.90 on /login + /design</div>
+      </div>
+      <div class="health">
+        <div class="health__top"><span class="health__dot health__dot--info"></span><span class="health__label">Bundle gate</span></div>
+        <div class="health__value">Operational — 200KB/route gzipped</div>
+      </div>
+      <div class="health">
+        <div class="health__top"><span class="health__dot health__dot--zero"></span><span class="health__label">Open PRs</span></div>
+        <div class="health__value">0</div>
+      </div>
+      <div class="health">
+        <div class="health__top"><span class="health__dot health__dot--ok"></span><span class="health__label">Doc coverage</span></div>
+        <div class="health__value">README + 7 docs/* files current</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 7. Mental model ===================== -->
+  <section id="mental-model">
+    <span class="section-eyebrow">07 — Mental model</span>
+    <h2 class="section-title">Mental model essentials</h2>
+    <p class="section-lede">Four things to internalize before opening the codebase.</p>
+
+    <div class="callout-grid">
+      <div class="callout">
+        <h3 class="callout__title">Core is pure TS</h3>
+        <p class="callout__body"><code>core/</code> never imports React, Next, or Dexie. SM-2 lives there. Test it without a browser.</p>
+      </div>
+      <div class="callout">
+        <h3 class="callout__title">Stub auth, banner mandatory</h3>
+        <p class="callout__body">Stub auth lives in <code>localStorage</code> via Zustand persist. NOT-PROD banner is mandatory on every authenticated route.</p>
+      </div>
+      <div class="callout">
+        <h3 class="callout__title">Ports and adapters</h3>
+        <p class="callout__body">Repository ports in <code>core/ports/</code>. Dexie impls in <code>lib/storage/</code>. Mock API in <code>lib/api/</code> wraps the same repos with simulated latency — swap to HTTP when backend lands.</p>
+      </div>
+      <div class="callout">
+        <h3 class="callout__title">Brand §12 is non-negotiable</h3>
+        <p class="callout__body">Zinc + Indigo only, dark-first, no gradients, no glassmorphism, ≤200ms animations, sentence case.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 8. Hotspots ===================== -->
+  <section id="hotspots">
+    <span class="section-eyebrow">08 — Hotspots</span>
+    <h2 class="section-title">Cognitive debt hotspots</h2>
+    <p class="section-lede">Known rough edges to address before v0.2 ships.</p>
+
+    <div class="callout-grid">
+      <div class="callout callout--warn">
+        <h3 class="callout__title">E2E flakiness</h3>
+        <p class="callout__body">Playwright happy-path races on Zustand auth-rehydration in CI. Marked <code>continue-on-error: true</code>. Stabilize with real auth in v0.2.</p>
+      </div>
+      <div class="callout callout--warn">
+        <h3 class="callout__title">Lighthouse audits public routes only</h3>
+        <p class="callout__body"><code>/dashboard</code> requires auth wall. Inject <code>storageState</code> in CI when backend lands.</p>
+      </div>
+      <div class="callout callout--warn">
+        <h3 class="callout__title">18 ESLint boundary suppressions</h3>
+        <p class="callout__body">All for intra-feature barrel re-exports. Acceptable; revisit config in v0.2.</p>
+      </div>
+      <div class="callout callout--warn">
+        <h3 class="callout__title">Dexie v1 → v2 migration single-shot</h3>
+        <p class="callout__body">Card entity bumped during phase-13 for §4.2 fields. Verify migration on real user data when there is any.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 9. Next steps ===================== -->
+  <section id="next-steps">
+    <span class="section-eyebrow">09 — Roadmap</span>
+    <h2 class="section-title">Next steps</h2>
+    <p class="section-lede">From v0.1.0 to mobile and beyond.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step__num"></div>
+        <div>
+          <div class="step__phase">Now</div>
+          <div class="step__body">Tag <code>v0.1.0</code> on main.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step__num"></div>
+        <div>
+          <div class="step__phase">v0.2</div>
+          <div class="step__body">Scaffold .NET 10 Identity service per doc §6.3; swap Zustand stub auth for real JWT.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step__num"></div>
+        <div>
+          <div class="step__phase">v0.3</div>
+          <div class="step__body">.NET 10 Vocabulary + Learning services; switch mock API client to HTTP client.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step__num"></div>
+        <div>
+          <div class="step__phase">v0.4</div>
+          <div class="step__body">AI features per doc §10.4 — GPT example generation, smart explanations.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step__num"></div>
+        <div>
+          <div class="step__phase">Phase 2</div>
+          <div class="step__body">React Native mobile, browser extension, voice pronunciation comparison.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 10. Footer ===================== -->
+  <footer class="footer">
+    <div class="footer__grid">
+      <ul class="footer__list">
+        <li>Generated 2026-05-10 04:46</li>
+        <li>Source of truth: <code>docs/Lexio_Complete_Documentation.docx</code></li>
+        <li>Plan: <code>plans/260509-1505-lexio-prototype-fe-vertical-slice/</code></li>
+        <li>Repo: <a href="https://github.com/bavanchun/lexio-FE">github.com/bavanchun/lexio-FE</a></li>
+      </ul>
+      <div class="footer__tag">Master vocabulary, the smart way.</div>
+    </div>
+  </footer>
+
+</main>
+
+<!-- ======================================================
+     Scripts
+     ====================================================== -->
+<script>
+  // ----- Theme toggle (sun/moon SVG, persisted to localStorage) -----
+  (function () {
+    var SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>';
+    var MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+
+    var btn = document.getElementById('themeToggle');
+    var icon = document.getElementById('themeIcon');
+    var saved = null;
+    try { saved = localStorage.getItem('theme'); } catch (e) {}
+    var initial = saved || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved) document.documentElement.setAttribute('data-theme', initial);
+    icon.innerHTML = initial === 'dark' ? SUN : MOON;
+
+    btn.addEventListener('click', function () {
+      var current = document.documentElement.getAttribute('data-theme')
+        || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      var next = current === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) {}
+      icon.innerHTML = next === 'dark' ? SUN : MOON;
+      // Re-render Mermaid diagrams with new theme tokens
+      renderMermaid();
+    });
+  })();
+
+  // ----- Mobile nav select -----
+  (function () {
+    var sel = document.getElementById('navSelect');
+    if (!sel) return;
+    sel.addEventListener('change', function () {
+      if (sel.value) location.hash = sel.value;
+    });
+  })();
+</script>
+
+<!-- Mermaid v11 ESM -->
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  window.__mermaid = mermaid;
+
+  function readTokens() {
+    var s = getComputedStyle(document.documentElement);
+    return {
+      bg: s.getPropertyValue('--card').trim() || '#ffffff',
+      border: s.getPropertyValue('--border-bright').trim() || '#D4D4D8',
+      text: s.getPropertyValue('--fg').trim() || '#09090B',
+      muted: s.getPropertyValue('--muted-fg').trim() || '#71717A',
+      primary: s.getPropertyValue('--primary').trim() || '#4F46E5',
+      surface2: s.getPropertyValue('--surface2').trim() || '#FAFAFA'
+    };
+  }
+
+  window.renderMermaid = async function renderMermaid() {
+    var t = readTokens();
+    var nodes = document.querySelectorAll('pre.mermaid');
+    if (!nodes.length) return;
+
+    // Cache original source on first run
+    nodes.forEach(function (n) {
+      if (!n.dataset.src) n.dataset.src = n.textContent;
+      n.removeAttribute('data-processed');
+      n.textContent = n.dataset.src;
+    });
+
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: 'loose',
+      theme: 'base',
+      themeVariables: {
+        background: t.bg,
+        primaryColor: t.surface2,
+        primaryTextColor: t.text,
+        primaryBorderColor: t.border,
+        lineColor: t.muted,
+        secondaryColor: t.surface2,
+        tertiaryColor: t.bg,
+        nodeBorder: t.border,
+        clusterBkg: t.surface2,
+        clusterBorder: t.border,
+        edgeLabelBackground: t.bg,
+        fontFamily: "'Inter', system-ui, sans-serif",
+        fontSize: '15px'
+      },
+      flowchart: { htmlLabels: true, curve: 'basis', padding: 16 }
+    });
+
+    await mermaid.run({ querySelector: 'pre.mermaid' });
+  };
+
+  renderMermaid();
+</script>
+
+</body>
+</html>
