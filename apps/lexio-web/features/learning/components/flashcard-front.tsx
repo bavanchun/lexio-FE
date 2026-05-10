@@ -19,10 +19,24 @@ export function FlashcardFront({ card, onFlip }: FlashcardFrontProps) {
     ['noun', 'verb', 'adjective', 'adverb', 'phrase', 'idiom'].includes(t),
   );
 
+  // Outer is a div with button semantics, not a <button>, because it contains
+  // an <AudioButton> — nested <button> is invalid HTML and triggers React
+  // hydration warnings. Keyboard activation (Enter/Space) is handled below;
+  // global Space-to-flip is also bound in useKeyboardShortcuts.
+  function handleKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onFlip();
+    }
+  }
+
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onFlip}
-      className="flex h-full w-full flex-col items-center justify-center gap-4 p-8 text-center focus:outline-none"
+      onKeyDown={handleKeyDown}
+      className="flex h-full w-full flex-col items-center justify-center gap-4 p-8 text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       aria-label="Tap to reveal answer"
     >
       {/* Word */}
@@ -51,6 +65,6 @@ export function FlashcardFront({ card, onFlip }: FlashcardFrontProps) {
       </div>
 
       <p className="mt-2 text-sm text-muted-foreground">Press Space or tap to reveal</p>
-    </button>
+    </div>
   );
 }
