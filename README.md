@@ -119,7 +119,7 @@ Strict adherence to doc §12 minimal-pro aesthetic — Linear / Vercel / Stripe 
 | [project-changelog.md](docs/project-changelog.md)       | Phases 01–12 deliverables                     |
 | [project-overview-pdr.md](docs/project-overview-pdr.md) | Product vision, personas, success metrics     |
 
-**Single authoritative spec:** `docs/Lexio_Complete_Documentation.docx`
+**Single authoritative spec:** `../docs/Lexio_Complete_Documentation.docx` (lives in parent monorepo umbrella, shared across FE / BE / Mobile repos)
 
 ## Known limitations
 

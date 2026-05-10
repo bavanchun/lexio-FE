@@ -1,6 +1,6 @@
 # Product overview — Lexio PDR
 
-> Distilled from doc §1–§3. Source of truth: `docs/Lexio_Complete_Documentation.docx`.
+> Distilled from doc §1–§3. Source of truth: `../docs/Lexio_Complete_Documentation.docx` (parent monorepo umbrella).
 
 ## Vision
 
